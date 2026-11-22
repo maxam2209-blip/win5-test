@@ -1,0 +1,176 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>WIN5 Ver.28 テスト版</title><style>:root{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;color:#152b3b;background:#f3f6fa}*{box-sizing:border-box}body{margin:0}header{background:#173d53;color:white;padding:18px 16px}h1{font-size:21px;margin:0}header p{margin:5px 0 0;color:#cbdde8;font-size:12px}main{max-width:850px;margin:auto;padding:12px}section{background:white;border-radius:14px;padding:15px;margin:12px 0;box-shadow:0 1px 4px #172b3b12}h2{font-size:17px;margin:0 0 12px}.sub{font-size:12px;color:#5a6977;line-height:1.6}label{display:block;font-size:12px;margin:8px 0 4px}input,textarea,button{font:inherit}input{padding:9px;border:1px solid #cbd5df;border-radius:8px;width:100%;min-width:0;background:white}button{background:#176389;border:0;border-radius:9px;padding:11px 13px;color:white;font-weight:600;margin:5px 4px 5px 0;cursor:pointer}button.alt{background:#e7f0f5;color:#173d53}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.race{border:1px solid #e1e9ef;border-radius:12px;padding:10px;margin:10px 0}.race h3{font-size:14px;margin:0 0 8px}.horse{display:grid;grid-template-columns:40px 1fr 1fr;gap:7px;align-items:center;margin:5px 0}.horse span{font-size:12px;color:#687988}.horse input{padding:7px}.scroll{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:12px}td,th{padding:8px;border-bottom:1px solid #e5edf3;text-align:right;white-space:nowrap}td:first-child,th:first-child{text-align:left}.bar{height:10px;background:#e7eff4;border-radius:10px;overflow:hidden;min-width:90px}.bar>i{display:block;background:#2783ae;height:100%}.stat{font-size:24px;font-weight:750}.warn{color:#9d5300}.ok{color:#127052}.hidden{display:none}.tag{font-size:11px;background:#e8eff5;padding:3px 7px;border-radius:5px}#msg{font-size:13px;white-space:pre-wrap}footer{padding:16px;font-size:11px;color:#62717f;text-align:center}</style></head><body><header><h1>WIN5 構造予測 <span class="tag">Ver.28 テスト</span></h1><p>iPhone Safari向け・Web公開版・予測計算は端末内で実行</p><p style="font-size:12px;margin:8px 0 0;color:#d7efff">Ver.28：レース確認・テスト区分・安全な保存更新（URL自動取得は未対応）</p></header><main><section><h2>開催情報</h2><div class="two"><div><label>開催日</label><input type="date" id="date"></div><div><label>オッズ取得日時</label><input type="datetime-local" id="obtained"></div></div><label>WIN5発売締切日時</label><input type="datetime-local" id="deadline"><p class="sub">締切前のオッズを入力してください。保存はSafariの同一サイト内のみ有効です。定期的にJSONバックアップを取得してください。</p><button onclick="saveDraft()" class="alt">入力を一時保存</button><button onclick="loadDemo()" class="alt">動作確認用データ</button></section><section id="url27"><h2>Ver.27｜URLでレース指定・簡単オッズ入力</h2><p class="sub">netkeibaの出馬表URLを貼り付けるとレースIDを識別します。<strong>外部サイトからのオッズ自動取得は行いません。</strong> netkeibaで確認した馬番と単勝オッズを、人気順に1行ずつ入力してください。例：<code>13 3.3</code>。入力済みデータは上書き前に確認します。</p><label for="url27race">WIN5の対象レース</label><select id="url27race" style="width:100%;padding:12px;border:1px solid #cbd5df;border-radius:8px"><option value="0">第1レース</option><option value="1">第2レース</option><option value="2">第3レース</option><option value="3">第4レース</option><option value="4">第5レース</option></select><label for="url27text">netkeibaのレースURL</label><input id="url27text" type="url" placeholder="https://race.netkeiba.com/race/shutuba.html?race_id=..." autocomplete="off"><button type="button" onclick="identify27()">URLを確認</button><button type="button" class="alt" onclick="open27()">出馬表を開く</button><p id="url27status" class="sub" aria-live="polite"></p><label for="odds27">人気順の「馬番 単勝オッズ」（1行に1頭）</label><textarea id="odds27" rows="7" style="width:100%;padding:11px;border:1px solid #cbd5df;border-radius:8px;font:inherit" placeholder="13 3.3&#10;11 6.7&#10;15 6.8&#10;1 7.9"></textarea><button type="button" onclick="preview27()">オッズを確認</button><button type="button" id="apply27" style="display:none" onclick="apply27()">このレースに反映</button><div id="preview27" class="scroll" aria-live="polite"></div><p class="sub">出走取消・除外馬は入力しないでください。全出走馬を入力しているか必ず確認してください。人気順位は入力した行順とします。同オッズはnetkeiba表示の人気順に並べてください。</p></section><section id="pastePanel"><h2>netkeibaから一括貼り付け（Ver.26）</h2><p class="sub">netkeibaの出馬表で「馬番・馬名・オッズ・人気」が含まれる複数行をコピーして、下の欄に貼り付けます。<strong>取消・除外馬は取り込みません。</strong> 取り込み後は必ず馬番・人気・オッズを照合してください。表のコピー形式によっては解析できません。</p><label for="pasteRace">貼り付け先のWIN5対象レース</label><select id="pasteRace" style="font:inherit;padding:12px;border:1px solid #cbd5df;border-radius:8px;width:100%"><option value="0">第1レース</option><option value="1">第2レース</option><option value="2">第3レース</option><option value="3">第4レース</option><option value="4">第5レース</option></select><label for="pasteText">出馬表のコピー内容</label><textarea id="pasteText" rows="8" placeholder="netkeibaの表をここに貼り付けてください。
+例：
+7	13	マリアイリダータ	3.3	1
+6	11	フォルテアンジェロ	6.7	2" style="width:100%;padding:10px;border:1px solid #cbd5df;border-radius:8px;line-height:1.5"></textarea><button type="button" onclick="previewNetkeiba()">解析して確認</button><button type="button" class="alt" onclick="pasteExample()">貼り付け例でテスト</button><div id="pasteFeedback" role="status" aria-live="polite" style="white-space:pre-wrap;font-size:13px;margin-top:8px"></div><div id="pastePreview" class="scroll"></div><button type="button" id="pasteApply" onclick="applyNetkeiba()" style="display:none">確認したデータを入力欄に反映</button><p class="sub">対応形式：タブ区切りの出馬表、または「馬番 馬名 単勝オッズ 人気」の1行1頭テキスト。順位が欠けた場合はオッズ昇順で推定します。全頭分をコピーできなければ推定確率は入力馬に限定されます。</p></section><section><h2>全出走馬のオッズ</h2><p class="sub">各レース最大18頭。人気順に馬番・単勝オッズを入力。未使用行は空欄にしてください。馬番は重複不可。サンプルデータは実際の予想ではありません。</p><div id="races"></div><button id="calcButton" onclick="calculate()">予測を計算</button><button class="alt" onclick="loadDemo();calculate()">サンプルで計算テスト</button><p id="msg" role="status" aria-live="polite"></p><p class="sub" id="runtime">起動確認中…</p></section><section id="v28"><h2>Ver.28｜予想の保存管理</h2>
+<p class="sub">保存前に5レースの入力を確認してください。過去の予想は勝手に削除しません。同じ開催日の更新は確認が必要です。</p>
+<label for="mode28">今回の予想区分</label>
+<select id="mode28" style="width:100%;padding:12px;border:1px solid #cbd5df;border-radius:8px">
+<option value="test">テスト用（動作確認）</option><option value="real">本番用（実際の予想）</option></select>
+<button type="button" class="alt" onclick="check28()">5レースの入力状況を確認</button>
+<div id="check28out" aria-live="polite" class="sub"></div>
+<h3 style="font-size:15px;margin:16px 0 5px">この開催日の保存状態</h3>
+<div id="saved28" class="sub">確認中...</div>
+<button type="button" class="alt" onclick="refresh28()">保存状態を更新</button>
+<p class="sub warn">テスト予想を本番に変更する際は、5レースの実際の出走馬・締切前オッズを入力し直して再計算してください。</p></section><section id="output" class="hidden"><h2>予測ダッシュボード</h2><div class="two"><div><div class="sub">候補点数</div><div class="stat" id="points"></div></div><div><div class="sub">購入金額（参考）</div><div class="stat" id="cost"></div></div></div><p class="sub" id="coverage"></p><h2>レース評価</h2><div id="grades"></div><h2 style="margin-top:20px">人気の和の確率分布</h2><p class="sub">全入力馬の単勝オッズから推定。人気順位5〜90を集計。</p><div id="bands"></div><h2 style="margin-top:20px">推定確率上位32点</h2><div class="scroll"><table><thead><tr><th>順位</th><th>馬番（1→5R）</th><th>人気の和</th><th>推定確率</th></tr></thead><tbody id="tickets"></tbody></table></div><button onclick="savePrediction()">この予想を保存</button><button class="alt" onclick="exportTickets()">32点をCSV出力</button></section><section><h2>結果入力・成績</h2><p class="sub">予想を保存してから結果を入力。払戻金は100円的中時のWIN5公式払戻額を入力します。</p><div class="two"><div><label>結果の開催日</label><input type="date" id="resultDate"></div><div><label>払戻金（円）</label><input type="number" min="0" id="payout" placeholder="例 123456"></div></div><div id="winnerFields" class="two"></div><button onclick="recordResult()">結果を記録</button><button class="alt" onclick="exportHistory()">履歴をCSV出力</button><div id="stats"></div></section><section><h2>データ管理</h2><button class="alt" onclick="backup()">全データをバックアップ</button><label>バックアップを復元（JSON）</label><input type="file" id="restore" accept=".json,application/json" onchange="restoreBackup(event)"><p class="sub warn">Safariの履歴・サイトデータを消去した場合や、別のブラウザで開いた場合、保存内容が引き継がれないことがあります。毎週バックアップを保存してください。</p></section></main><footer>推定確率は単勝オッズ逆数の正規化に基づくモデル値です。配当期待値・収益性は推定していません。購入は手動で判断してください。</footer><script>
+'use strict';const KEY='win5v23';let last=null;let calculatedFingerprint=null;let store;let storageAvailable=true;try{store=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){store={};storageAvailable=false}store.drafts??={};store.predictions??={};store.results??={};const $=id=>document.getElementById(id);const fmt=x=>(x*100).toFixed(3)+'%';function persist(){try{localStorage.setItem(KEY,JSON.stringify(store));storageAvailable=true;return true}catch(e){storageAvailable=false;alert('この環境では保存できません。SafariのHTTPSサイトで開き、JSONバックアップを利用してください。');return false}}function renderInputs(){let html='';for(let r=0;r<5;r++){html+=`<div class="race"><h3>第${r+1}レース <span id="grade${r}" class="tag">未計算</span></h3>`;for(let j=0;j<18;j++)html+=`<div class="horse"><span>${j+1}人気</span><input id="n${r}_${j}" type="number" inputmode="numeric" min="1" max="18" placeholder="馬番"><input id="o${r}_${j}" type="number" inputmode="decimal" min="1" step="0.1" placeholder="単勝オッズ"></div>`;html+='</div>'} $('races').innerHTML=html;let s='';for(let i=0;i<5;i++)s+=`<div><label>第${i+1}R 勝ち馬番</label><input id="w${i}" type="number" inputmode="numeric" min="1" max="18"></div>`;$('winnerFields').innerHTML=s}renderInputs();$('date').value=new Date().toLocaleDateString('sv-SE');$('resultDate').value=$('date').value;function readInputs(){const races=[];for(let r=0;r<5;r++){let a=[],seen=new Set(),blank=false;for(let j=0;j<18;j++){const ns=$(`n${r}_${j}`).value.trim(),os=$(`o${r}_${j}`).value.trim();if(!ns&&!os){blank=true;continue}if(!ns||!os)throw Error(`第${r+1}R ${j+1}人気の馬番・オッズを両方入力してください`);if(blank)throw Error(`第${r+1}Rは人気順に詰めて入力してください`);const n=Number(ns),o=Number(os);if(!Number.isInteger(n)||n<1||n>18||seen.has(n)||!Number.isFinite(o)||o<1)throw Error(`第${r+1}R ${j+1}人気の入力を確認してください`);if(a.length&&o<a[a.length-1].odds)throw Error(`第${r+1}Rのオッズが人気順ではありません`);seen.add(n);a.push({number:n,odds:o,rank:j+1})}if(a.length<2)throw Error(`第${r+1}Rは2頭以上入力してください`);const z=a.reduce((s,x)=>s+1/x.odds,0);a.forEach(x=>x.p=(1/x.odds)/z);races.push(a)}return races}function top32(races){let cur=[{p:1,nums:[],ranks:[]}];for(const race of races){let next=[];for(const prev of cur)for(const horse of race)next.push({p:prev.p*horse.p,nums:[...prev.nums,horse.number],ranks:[...prev.ranks,horse.rank]});next.sort((a,b)=>b.p-a.p);cur=next.slice(0,32)}return cur}function distribution(races){let dp=new Array(91).fill(0);dp[0]=1;for(const race of races){let next=new Array(91).fill(0);for(let s=0;s<=90;s++)if(dp[s])for(const h of race)if(s+h.rank<=90)next[s+h.rank]+=dp[s]*h.p;dp=next}return dp}function inputFingerprint(){const values=[$('date').value,$('obtained').value,$('deadline').value];for(let r=0;r<5;r++)for(let j=0;j<18;j++)values.push($(`n${r}_${j}`).value,$(`o${r}_${j}`).value);return JSON.stringify(values)}function calculate(){try{const date=$('date').value,obt=$('obtained').value,dl=$('deadline').value;if(!date||!obt||!dl)throw Error('開催日・オッズ取得日時・締切日時を入力してください');if(new Date(obt)>=new Date(dl))throw Error('オッズ取得日時が締切以降です。締切前のデータを使用してください');const races=readInputs(),tickets=top32(races),dp=distribution(races),grades=races.map(a=>{let ratio=a[1].odds/a[0].odds;return ratio>=3?'S':ratio>=2?'A':ratio>=1.5?'B':ratio>=1.3?'C':'D'});const cover=tickets.reduce((s,x)=>s+x.p,0);last={date,obt,dl,races,tickets,dp,grades,cover};calculatedFingerprint=inputFingerprint();$('output').classList.remove('hidden');$('points').textContent=tickets.length+'点';$('cost').textContent=(tickets.length*100).toLocaleString()+'円';$('coverage').textContent='全入力馬が出走馬を網羅している場合のモデル推定カバー率：'+fmt(cover)+'。これは実際の的中率ではありません。';$('grades').innerHTML=grades.map((g,i)=>`<span class="tag">第${i+1}R：${g}</span>`).join(' ');const bands=[[5,10],[11,15],[16,20],[21,25],[26,90]];$('bands').innerHTML=bands.map(([a,b])=>{let p=dp.slice(a,b+1).reduce((s,x)=>s+x,0);return `<div class="two" style="align-items:center;margin:9px 0"><span>${a}〜${b===90?'90':b}：${(p*100).toFixed(1)}%</span><div class="bar"><i style="width:${p*100}%"></i></div></div>`}).join('');$('tickets').innerHTML=tickets.map((x,i)=>`<tr><td>${i+1}</td><td>${x.nums.join(' - ')}</td><td>${x.ranks.reduce((a,b)=>a+b,0)}</td><td>${fmt(x.p)}</td></tr>`).join('');for(let i=0;i<5;i++)$(`grade${i}`).textContent=grades[i];$('msg').textContent='計算完了。保存ボタンで予想を確定してください';$('msg').className='ok';$('resultDate').value=date;$('output').scrollIntoView({behavior:'smooth'});}catch(e){$('msg').textContent=e.message;$('msg').className='warn'}}function saveDraft(silent=false){const a=[];for(let r=0;r<5;r++){let row=[];for(let j=0;j<18;j++)row.push([$(`n${r}_${j}`).value,$(`o${r}_${j}`).value]);a.push(row)}store.drafts[$('date').value]={a,obt:$('obtained').value,dl:$('deadline').value,helper28:{url:$('url27text').value,odds:$('odds27').value,race:$('url27race').value,mode:$('mode28').value}};const ok=persist();if(!silent&&ok)alert('入力を一時保存しました')}function restoreDraft(date){let d=store.drafts[date];if(!d)return;if(d.helper28){$('url27text').value=d.helper28.url||'';$('odds27').value=d.helper28.odds||'';$('url27race').value=d.helper28.race||'0';$('mode28').value=d.helper28.mode||'test'}$('obtained').value=d.obt;$('deadline').value=d.dl;for(let r=0;r<5;r++)for(let j=0;j<18;j++){const x=d.a[r][j];$(`n${r}_${j}`).value=x[0];$(`o${r}_${j}`).value=x[1]}}$('date').addEventListener('change',()=>{restoreDraft($('date').value);$('resultDate').value=$('date').value});let autosaveTimer;document.addEventListener('input',e=>{if(!['obtained','deadline','url27text','odds27','mode28','url27race'].includes(e.target.id)&&!/^([no]\d+_\d+)$/.test(e.target.id))return;clearTimeout(autosaveTimer);autosaveTimer=setTimeout(()=>{if($('date').value&&storageAvailable)saveDraft(true)},1800)});restoreDraft($('date').value);function savePrediction(){if(!last){alert('先に予測を計算してください');return}if(calculatedFingerprint!==inputFingerprint()){alert('予測後に入力内容が変わっています。再計算してから保存してください');return}const prior=store.predictions[last.date];const mode=document.getElementById('mode28').value;
+if(prior){
+ if(store.results[last.date]){alert('この開催日は結果記録済みです。予想の更新はできません。');return}
+ const priorMode=prior.mode28==='real'?'本番':'テスト（旧版の保存は区分不明）';
+ if(!confirm('この開催日には保存済み予想があります（'+priorMode+'）。\\n更新すると以前の32点予想が置き換わります。\\n続けますか？'))return;
+ if(!confirm('最終確認：'+last.date+' の保存済み予想を、現在の'+(mode==='real'?'本番':'テスト')+'予想で更新しますか？'))return;
+}else if(!confirm((mode==='real'?'本番':'テスト')+'予想として '+last.date+' の32点を保存しますか？'))return;
+const next={...last,mode28:mode,savedAt28:new Date().toISOString()};
+store.predictions[last.date]=next;
+if(!persist()){if(prior)store.predictions[last.date]=prior;else delete store.predictions[last.date];return}
+alert(prior?'保存済み予想を更新しました':'予想を保存しました。結果入力から照合できます');showStats();refresh28()}function recordResult(){const date=$('resultDate').value,p=store.predictions[date];if(!p){alert('この開催日の保存済み予想がありません');return}if(store.results[date]){alert('この開催日の結果は記録済みです');return}const winners=[];for(let i=0;i<5;i++){const x=Number($(`w${i}`).value);if(!Number.isInteger(x)||x<1||x>18){alert('5レースの勝ち馬番を入力してください');return}winners.push(x)}const payout=Number($('payout').value);if($('payout').value===''||!Number.isFinite(payout)||payout<0){alert('払戻金を入力してください');return}const hit=p.tickets.some(t=>t.nums.every((x,i)=>x===winners[i]));const ranks=winners.map((n,i)=>p.races[i].find(h=>h.number===n)?.rank??null);store.results[date]={date,winners,payout,hit,ranks,stake:p.tickets.length*100,received:hit?payout:0,cover:p.cover};persist();alert(hit?'的中として記録しました':'不的中として記録しました');showStats()}function showStats(){const a=Object.values(store.results);if(!a.length){$('stats').innerHTML='<p class="sub">まだ結果記録はありません。</p>';return}const stake=a.reduce((s,x)=>s+x.stake,0),received=a.reduce((s,x)=>s+x.received,0),hits=a.filter(x=>x.hit).length,expected=a.reduce((s,x)=>s+x.cover,0);$('stats').innerHTML=`<p><strong>${a.length}開催 / ${hits}回的中</strong></p><p class="sub">的中率 ${(hits/a.length*100).toFixed(2)}% ・ 予測的中回数 ${expected.toFixed(2)}回<br>購入合計 ${stake.toLocaleString()}円 ・ 払戻合計 ${received.toLocaleString()}円<br>回収率 ${(received/stake*100).toFixed(1)}% ・ 収支 ${(received-stake).toLocaleString()}円</p>`}showStats();function download(name,data,type){const blob=new Blob([data],{type});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000)}function exportTickets(){if(!last)return;const rows=[['順位','開催日','第1R','第2R','第3R','第4R','第5R','人気の和','推定確率'],...last.tickets.map((t,i)=>[i+1,last.date,...t.nums,t.ranks.reduce((a,b)=>a+b,0),t.p])];download(`win5_${last.date}_32.csv`,'\ufeff'+rows.map(x=>x.join(',')).join('\r\n'),'text/csv;charset=utf-8')}function exportHistory(){const rows=[['開催日','的中','購入額','払戻額','収支','予測カバー率','実際の人気の和'],...Object.values(store.results).map(x=>[x.date,x.hit?1:0,x.stake,x.received,x.received-x.stake,x.cover,x.ranks.every(n=>n!==null)?x.ranks.reduce((a,b)=>a+b,0):'未収録'])];download('win5_history.csv','\ufeff'+rows.map(x=>x.join(',')).join('\r\n'),'text/csv;charset=utf-8')}function backup(){download('win5_backup.json',JSON.stringify(store,null,2),'application/json')}function restoreBackup(e){const f=e.target.files[0];if(!f)return;const reader=new FileReader();reader.onload=()=>{try{const x=JSON.parse(reader.result);if(!x.predictions||!x.results)throw Error('不正なファイル');if(!confirm('現在の保存データをバックアップ内容で置き換えますか？'))return;store=x;persist();showStats();alert('復元しました')}catch(err){alert('バックアップを読み込めませんでした')}};reader.readAsText(f)}function loadDemo(){if(!confirm('入力欄をサンプルデータで置き換えますか？'))return;for(let r=0;r<5;r++)for(let j=0;j<18;j++){let enabled=j<8;$(`n${r}_${j}`).value=enabled?j+1:'';$(`o${r}_${j}`).value=enabled?(2.5+j*2.8+r*.2).toFixed(1):''}const d=$('date').value;$('obtained').value=d+'T12:00';$('deadline').value=d+'T14:00';$('msg').textContent='サンプルデータを入力しました。実際のレースには使用しないでください'}
+
+window.addEventListener('error',function(e){const m=document.getElementById('msg');if(m){m.textContent='エラー: '+(e.message||'不明なエラー');m.className='warn'}});
+
+try{document.getElementById('runtime').textContent='JavaScript起動済み｜'+(location.protocol==='https:'?'HTTPSサイト':'ローカル/プレビュー表示（保存・計算が制限される場合あり）')+(storageAvailable?'｜保存機能利用可':'｜保存機能制限あり')}catch(e){}
+</script><script>
+/* Ver.26: netkeiba paste import. No network requests or scraping. */
+let pendingImport=null;
+function parseNetkeiba(text){
+  const out=[], rejected=[];
+  const lines=text.replace(/\r/g,'').split('\n');
+  for(let i=0;i<lines.length;i++){
+    const line=lines[i].trim();if(!line)continue;
+    if(/取消|除外|出走取消|競走除外/.test(line)){rejected.push(i+1);continue}
+    let fields=line.split(/\t+/).map(x=>x.trim()).filter(Boolean);
+    let number,odds,rank,name='';
+    if(fields.length>=4){
+      // netkeiba table: frame, horse number, marks, name, ..., odds, popularity, favorites
+      const leading=fields.slice(0,3).map(x=>/^\d{1,2}$/.test(x)?Number(x):null);
+      if(leading[0]!==null&&leading[1]!==null)number=leading[1];
+      else if(leading[0]!==null)number=leading[0];
+      const candidates=[];
+      for(let k=2;k<fields.length;k++){
+        if(/^\d+(?:\.\d+)?$/.test(fields[k])){
+          const o=Number(fields[k]);const n=Number(fields[k+1]);
+          if(o>=1&&o<=9999&&Number.isInteger(n)&&n>=1&&n<=18&&/^\d{1,2}$/.test(fields[k+1]))candidates.push({odds:o,rank:n,k});
+        }
+      }
+      if(candidates.length){const c=candidates[candidates.length-1];odds=c.odds;rank=c.rank}
+      name=fields.find(x=>/[ぁ-んァ-ヶ一-龯]/.test(x)&&!/(?:取消|除外)/.test(x))||'';
+    }
+    if(number===undefined||odds===undefined){
+      // compact lines: '13 マリアイリダータ 3.3 1' or '13 3.3 1'
+      const m=line.match(/^\s*(\d{1,2})\s+(.+?)\s+(\d+(?:\.\d+)?)\s+(\d{1,2})\s*$/);
+      if(m){number=Number(m[1]);name=m[2];odds=Number(m[3]);rank=Number(m[4])}
+    }
+    if(Number.isInteger(number)&&number>=1&&number<=18&&Number.isFinite(odds)&&odds>=1&&Number.isInteger(rank)&&rank>=1&&rank<=18)out.push({number,odds,rank,name,line:i+1});
+  }
+  if(!out.length)throw Error('馬番・オッズ・人気を読み取れませんでした。表の「馬番〜人気」列を含めてコピーしてください。');
+  const numbers=new Set(),ranks=new Set();for(const h of out){if(numbers.has(h.number)||ranks.has(h.rank))throw Error('同じ馬番または人気順位が重複しています。コピーした範囲を確認してください。');numbers.add(h.number);ranks.add(h.rank)}
+  out.sort((a,b)=>a.rank-b.rank);
+  for(let i=0;i<out.length;i++){
+    if(out[i].rank!==i+1)throw Error('人気順位が1位から連続していません（'+out.map(x=>x.rank).join(',')+'）。全頭分をコピーするか、表の形式を確認してください。');
+    if(i&&out[i].odds<out[i-1].odds)throw Error('人気順位とオッズの順序が一致しません。コピー内容を確認してください。');
+  }
+  if(out.length>18)throw Error('18頭を超えています。1レース分だけコピーしてください。');
+  return {horses:out,rejected};
+}
+function previewNetkeiba(){
+  const feedback=document.getElementById('pasteFeedback'),preview=document.getElementById('pastePreview');
+  pendingImport=null;document.getElementById('pasteApply').style.display='none';preview.innerHTML='';
+  try{
+    const data=parseNetkeiba(document.getElementById('pasteText').value);
+    pendingImport={race:Number(document.getElementById('pasteRace').value),horses:data.horses};
+    feedback.textContent=data.horses.length+'頭を解析しました。'+(data.rejected.length?'取消・除外行を除外しました。':'')+' 下の表をnetkeibaと照合してから反映してください。';feedback.className='ok';
+    const table=document.createElement('table');const head=document.createElement('thead');head.innerHTML='<tr><th>人気</th><th>馬番</th><th>馬名（参考）</th><th>単勝オッズ</th></tr>';table.append(head);
+    const body=document.createElement('tbody');data.horses.forEach(h=>{const tr=document.createElement('tr');[h.rank,h.number,h.name,h.odds].forEach(v=>{const td=document.createElement('td');td.textContent=String(v);tr.append(td)});body.append(tr)});table.append(body);preview.append(table);
+    document.getElementById('pasteApply').style.display='inline-block';
+  }catch(e){feedback.textContent=e.message;feedback.className='warn'}
+}
+function applyNetkeiba(){
+  if(!pendingImport)return;
+  const r=pendingImport.race,hs=pendingImport.horses;
+  const existing=Array.from({length:18},(_,j)=>document.getElementById('n'+r+'_'+j).value||document.getElementById('o'+r+'_'+j).value).some(Boolean);
+  if(existing&&!confirm('第'+(r+1)+'レースの既存入力を上書きしますか？'))return;
+  for(let j=0;j<18;j++){
+    document.getElementById('n'+r+'_'+j).value=hs[j]?hs[j].number:'';
+    document.getElementById('o'+r+'_'+j).value=hs[j]?hs[j].odds:'';
+  }
+  last=null;calculatedFingerprint=null;document.getElementById('output').classList.add('hidden');
+  if(document.getElementById('date').value)saveDraft(true);
+  document.getElementById('pasteFeedback').textContent='第'+(r+1)+'レースに'+hs.length+'頭を反映しました。残りのレースも取り込み、最後に「予測を計算」を押してください。';
+  document.getElementById('pasteApply').style.display='none';pendingImport=null;
+}
+function pasteExample(){
+  document.getElementById('pasteText').value='7\t13\tマリアイリダータ\t3.3\t1\n6\t11\tフォルテアンジェロ\t6.7\t2\n8\t15\tキャントウェイト\t6.8\t3\n1\t1\tカラマティアノス\t7.9\t4\n4\t8\tヨヒーン\t9.1\t5';
+  previewNetkeiba();
+}
+</script><script>
+/* Ver.27 experimental helper: no remote fetching, no cross-origin requests. */
+let ready27=null;
+function identify27(){
+ const el=document.getElementById('url27status');
+ try{
+  const u=new URL(document.getElementById('url27text').value.trim());
+  if(u.protocol!=='https:'||u.hostname!=='race.netkeiba.com'||!/^\/race\/(?:shutuba|odds|result|race)\.html$/.test(u.pathname))throw Error('netkeibaの出馬表URLを貼り付けてください。');
+  const id=u.searchParams.get('race_id');if(!/^\d{12}$/.test(id||''))throw Error('12桁のレースIDが見つかりません。');
+  el.textContent='レースID: '+id+' を確認しました。出馬表を見ながら下の欄に馬番と単勝オッズを入力してください。';el.className='ok';return id;
+ }catch(e){el.textContent=e.message;el.className='warn';return null}
+}
+function open27(){const id=identify27();if(id)window.open('https://race.netkeiba.com/race/shutuba.html?race_id='+id,'_blank','noopener,noreferrer')}
+function preview27(){
+ ready27=null;document.getElementById('apply27').style.display='none';const target=document.getElementById('preview27');target.textContent='';
+ try{
+  const id=identify27();if(!id)throw Error('先にURLを確認してください。');
+  const lines=document.getElementById('odds27').value.trim().split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+  if(lines.length<2||lines.length>18)throw Error('2〜18頭分のデータを入力してください。');
+  const horses=[],used=new Set();let prev=0;
+  for(let i=0;i<lines.length;i++){
+   const m=lines[i].match(/^(\d{1,2})[\s,，:：]+(\d+(?:\.\d+)?)$/);
+   if(!m)throw Error((i+1)+'行目は「馬番 オッズ」の形式で入力してください。');
+   const no=Number(m[1]),odds=Number(m[2]);
+   if(no<1||no>18||used.has(no)||odds<1.01||odds>9999||odds<prev)throw Error((i+1)+'行目の馬番重複・オッズ順序・値を確認してください。');
+   used.add(no);prev=odds;horses.push({no,odds});
+  }
+  const race=Number(document.getElementById('url27race').value);ready27={id,race,horses};
+  const table=document.createElement('table');const head=document.createElement('thead');head.innerHTML='<tr><th>人気</th><th>馬番</th><th>単勝オッズ</th></tr>';table.append(head);const body=document.createElement('tbody');
+  horses.forEach((h,i)=>{const tr=document.createElement('tr');[i+1,h.no,h.odds].forEach(v=>{const td=document.createElement('td');td.textContent=String(v);tr.append(td)});body.append(tr)});table.append(body);
+  target.append(table);const p=document.createElement('p');p.className='warn';p.textContent=horses.length+'頭です。出走頭数・取消馬・人気順をnetkeibaで照合してから反映してください。';target.prepend(p);
+  document.getElementById('apply27').style.display='inline-block';
+ }catch(e){target.textContent=e.message;target.className='warn'}
+}
+function apply27(){
+ if(!ready27)return;const {race,horses,id}=ready27;
+ const filled=Array.from({length:18},(_,j)=>document.getElementById('n'+race+'_'+j).value||document.getElementById('o'+race+'_'+j).value).some(Boolean);
+ if(filled&&!confirm('第'+(race+1)+'レースの入力を上書きしますか？'))return;
+ for(let j=0;j<18;j++){document.getElementById('n'+race+'_'+j).value=horses[j]?horses[j].no:'';document.getElementById('o'+race+'_'+j).value=horses[j]?horses[j].odds:''}
+ last=null;calculatedFingerprint=null;document.getElementById('output').classList.add('hidden');
+ if(document.getElementById('date').value)saveDraft(true);
+ document.getElementById('preview27').textContent='第'+(race+1)+'レースに'+horses.length+'頭を反映しました（レースID '+id+'）。';document.getElementById('apply27').style.display='none';ready27=null;
+}
+</script><script>
+/* Ver.28: safe saved-prediction management; existing storage key is intentionally unchanged. */
+function refresh28(){
+ const date=document.getElementById('date').value, el=document.getElementById('saved28');
+ const p=store.predictions[date],res=store.results[date];
+ if(!p){el.textContent='この開催日の保存済み予想はありません。';return}
+ const mode=p.mode28==='test'?'テスト用':p.mode28==='real'?'本番用':'旧版保存（区分不明）';
+ el.textContent='保存済み：'+date+' ／ '+mode+' ／ '+(p.tickets?.length||0)+'点'+(res?' ／ 結果記録済み・更新不可':' ／ 確認後に更新可能');
+}
+function check28(){
+ const out=document.getElementById('check28out');
+ const rows=[];
+ for(let r=0;r<5;r++){
+  const horses=[],used=new Set();let issue='';
+  for(let j=0;j<18;j++){
+   const n=document.getElementById('n'+r+'_'+j).value, o=document.getElementById('o'+r+'_'+j).value;
+   if(!n&&!o)continue;
+   if(!n||!o){issue='馬番またはオッズが未入力';continue}
+   if(used.has(n))issue='馬番の重複';
+   used.add(n);horses.push(n);
+  }
+  rows.push('第'+(r+1)+'R：'+horses.length+'頭'+(issue?'（注意：'+issue+'）':'')+' ／ 人気1位の馬番：'+(horses[0]||'未入力'));
+ }
+ out.textContent=rows.join('\\n')+'\\n※入力頭数が実際の出走頭数と一致するか確認してください。';
+ out.style.whiteSpace='pre-line';
+}
+document.getElementById('date').addEventListener('change',refresh28);
+document.getElementById('mode28').addEventListener('change',()=>{if(document.getElementById('date').value)saveDraft(true)});
+document.getElementById('url27race').addEventListener('change',()=>{if(document.getElementById('date').value)saveDraft(true)});
+refresh28();
+</script></body></html>
