@@ -1,0 +1,355 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>WIN5 Ver.76 研究検証版</title><style>:root{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;color:#152b3b;background:#f3f6fa}*{box-sizing:border-box}body{margin:0}header{background:#173d53;color:white;padding:18px 16px}h1{font-size:21px;margin:0}header p{margin:5px 0 0;color:#cbdde8;font-size:12px}main{max-width:850px;margin:auto;padding:12px}section{background:white;border-radius:14px;padding:15px;margin:12px 0;box-shadow:0 1px 4px #172b3b12}h2{font-size:17px;margin:0 0 12px}.sub{font-size:12px;color:#5a6977;line-height:1.6}label{display:block;font-size:12px;margin:8px 0 4px}input,textarea,button{font:inherit}input{padding:9px;border:1px solid #cbd5df;border-radius:8px;width:100%;min-width:0;background:white}button{background:#176389;border:0;border-radius:9px;padding:11px 13px;color:white;font-weight:600;margin:5px 4px 5px 0;cursor:pointer}button.alt{background:#e7f0f5;color:#173d53}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.race{border:1px solid #e1e9ef;border-radius:12px;padding:10px;margin:10px 0}.race h3{font-size:14px;margin:0 0 8px}.horse{display:grid;grid-template-columns:40px 1fr 1fr;gap:7px;align-items:center;margin:5px 0}.horse span{font-size:12px;color:#687988}.horse input{padding:7px}.scroll{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:12px}td,th{padding:8px;border-bottom:1px solid #e5edf3;text-align:right;white-space:nowrap}td:first-child,th:first-child{text-align:left}.bar{height:10px;background:#e7eff4;border-radius:10px;overflow:hidden;min-width:90px}.bar>i{display:block;background:#2783ae;height:100%}.stat{font-size:24px;font-weight:750}.warn{color:#9d5300}.ok{color:#127052}.hidden{display:none}.tag{font-size:11px;background:#e8eff5;padding:3px 7px;border-radius:5px}#msg{font-size:13px;white-space:pre-wrap}footer{padding:16px;font-size:11px;color:#62717f;text-align:center}</style><style id="v30css">.v30stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.v30stat{background:#edf3f7;border-radius:10px;padding:12px}.v30stat b{display:block;font-size:21px;margin-top:5px}.v30table select{font:inherit;max-width:115px;padding:7px;border-radius:7px;border:1px solid #cbd5df;background:white}.v30table button{padding:7px;font-size:12px}.v30table td,.v30table th{white-space:normal;min-width:60px}.v30table td:first-child{min-width:95px}</style><style>header .tag{color:#173d53}.two{grid-template-columns:repeat(2,minmax(0,1fr))}.two>div{min-width:0}input[type=date],input[type=datetime-local]{display:block;max-width:100%;min-width:0;font-size:14px} @media(max-width:480px){section:first-child .two{grid-template-columns:1fr}}</style></head><body><header><h1>WIN5 構造予測 <span class="tag">Ver.76 研究検証</span></h1><p>iPhone Safari向け・Web公開版・予測計算は端末内で実行</p><p style="font-size:12px;margin:8px 0 0;color:#d7efff">締切前予測の固定保存・購入なし検証（URL自動取得は未対応）</p></header><main><section><h2>開催情報</h2><div class="two"><div><label>開催日</label><input type="date" id="date"></div><div><label>オッズ取得日時</label><input type="datetime-local" id="obtained"></div></div><label>WIN5発売締切日時</label><input type="datetime-local" id="deadline"><p class="sub">締切前のオッズを入力してください。保存はSafariの同一サイト内のみ有効です。定期的にJSONバックアップを取得してください。</p><button onclick="saveDraft()" class="alt">入力を一時保存</button><button onclick="loadDemo()" class="alt">動作確認用データ</button></section><section id="url27"><h2>Ver.32｜URL任意・簡単オッズ入力</h2><p class="sub">netkeibaの出馬表URLは任意です。貼り付けた場合はレースIDを識別します。URLなしでも手入力できます。<strong>外部サイトからのオッズ自動取得は行いません。</strong> netkeibaで確認した馬番と単勝オッズを、人気順に1行ずつ入力してください。例：<code>13 3.3</code>。入力済みデータは上書き前に確認します。</p><label for="url27race">WIN5の対象レース</label><select id="url27race" style="width:100%;padding:12px;border:1px solid #cbd5df;border-radius:8px"><option value="0">第1レース</option><option value="1">第2レース</option><option value="2">第3レース</option><option value="3">第4レース</option><option value="4">第5レース</option></select><label for="url27text">netkeibaのレースURL（任意）</label><input id="url27text" type="url" placeholder="https://race.netkeiba.com/race/shutuba.html?race_id=..." autocomplete="off"><button type="button" onclick="identify27()">URLを確認</button><button type="button" class="alt" onclick="open27()">出馬表を開く</button><p id="url27status" class="sub" aria-live="polite"></p><label for="odds27">人気順の「馬番 単勝オッズ」（1行に1頭）</label><textarea id="odds27" rows="7" style="width:100%;padding:11px;border:1px solid #cbd5df;border-radius:8px;font:inherit" placeholder="13 3.3&#10;11 6.7&#10;15 6.8&#10;1 7.9"></textarea><button type="button" onclick="preview27()">オッズを確認</button><button type="button" class="alt" onclick="fill31All()">テスト用：同じオッズを5レースに反映</button><p class="sub">架空データの動作確認専用です。開催日・区分を確認し、5レース分の既存入力がある場合は上書き確認が出ます。本番の予想には使わないでください。</p><button type="button" id="apply27" style="display:none" onclick="apply27()">このレースに反映</button><div id="preview27" class="scroll" aria-live="polite"></div><p class="sub">出走取消・除外馬は入力しないでください。全出走馬を入力しているか必ず確認してください。人気順位は入力した行順とします。同オッズはnetkeiba表示の人気順に並べてください。</p></section><section id="pastePanel"><h2>netkeibaから一括貼り付け（Ver.26）</h2><p class="sub">netkeibaの出馬表で「馬番・馬名・オッズ・人気」が含まれる複数行をコピーして、下の欄に貼り付けます。<strong>取消・除外馬は取り込みません。</strong> 取り込み後は必ず馬番・人気・オッズを照合してください。表のコピー形式によっては解析できません。</p><label for="pasteRace">貼り付け先のWIN5対象レース</label><select id="pasteRace" style="font:inherit;padding:12px;border:1px solid #cbd5df;border-radius:8px;width:100%"><option value="0">第1レース</option><option value="1">第2レース</option><option value="2">第3レース</option><option value="3">第4レース</option><option value="4">第5レース</option></select><label for="pasteText">出馬表のコピー内容</label><textarea id="pasteText" rows="8" placeholder="netkeibaの表をここに貼り付けてください。
+例：
+7	13	マリアイリダータ	3.3	1
+6	11	フォルテアンジェロ	6.7	2" style="width:100%;padding:10px;border:1px solid #cbd5df;border-radius:8px;line-height:1.5"></textarea><button type="button" onclick="previewNetkeiba()">解析して確認</button><button type="button" class="alt" onclick="pasteExample()">貼り付け例でテスト</button><div id="pasteFeedback" role="status" aria-live="polite" style="white-space:pre-wrap;font-size:13px;margin-top:8px"></div><div id="pastePreview" class="scroll"></div><button type="button" id="pasteApply" onclick="applyNetkeiba()" style="display:none">確認したデータを入力欄に反映</button><p class="sub">対応形式：タブ区切りの出馬表、または「馬番 馬名 単勝オッズ 人気」の1行1頭テキスト。順位が欠けた場合はオッズ昇順で推定します。全頭分をコピーできなければ推定確率は入力馬に限定されます。</p></section><section><h2>全出走馬のオッズ</h2><p class="sub">各レース最大18頭。人気順に馬番・単勝オッズを入力。未使用行は空欄にしてください。馬番は重複不可。サンプルデータは実際の予想ではありません。</p><div id="races"></div><button id="calcButton" onclick="calculate()">予測を計算</button><button class="alt" onclick="loadDemo();calculate()">サンプルで計算テスト</button><p id="msg" role="status" aria-live="polite"></p><p class="sub" id="runtime">起動確認中…</p></section><section id="v28"><h2>Ver.28｜予想の保存管理</h2>
+<p class="sub">保存前に5レースの入力を確認してください。過去の予想は勝手に削除しません。同じ開催日の更新は確認が必要です。</p>
+<label for="mode28">今回の予想区分</label>
+<select id="mode28" style="width:100%;padding:12px;border:1px solid #cbd5df;border-radius:8px">
+<option value="test">テスト用（動作確認）</option><option value="paper">実開催・購入なし</option><option value="real">本番用（実購入）</option></select>
+<button type="button" class="alt" onclick="check28()">5レースの入力状況を確認</button>
+<div id="check28out" aria-live="polite" class="sub"></div>
+<h3 style="font-size:15px;margin:16px 0 5px">この開催日の保存状態</h3>
+<div id="saved28" class="sub">確認中...</div>
+<button type="button" class="alt" onclick="refresh28()">保存状態を更新</button>
+<p class="sub warn">テスト予想を本番に変更する際は、5レースの実際の出走馬・締切前オッズを入力し直して再計算してください。</p></section><section id="v30dashboard"><h2>Ver.37｜成績ダッシュボード</h2><p class="sub">予想計算と成績管理を統合しました。本番とテストは分けて集計します。旧データは未分類として扱います。</p><label for="v30filter">集計対象</label><select id="v30filter" style="width:100%;padding:11px;border:1px solid #cbd5df;border-radius:8px" onchange="v30Render()"><option value="paper">実開催・購入なし</option><option value="real">本番のみ</option><option value="test">テストのみ</option><option value="all">すべて（参考）</option></select><div id="v30stats" class="v30stats" style="margin-top:12px"></div><p id="v30notes" class="sub"></p><h2 style="margin-top:18px">保存済み予想と詳細</h2><div class="scroll"><table class="v30table"><thead><tr><th>開催日</th><th>区分</th><th>点数</th><th>結果</th><th>収支</th><th>操作</th></tr></thead><tbody id="v30rows"></tbody></table></div><div id="v30detail" style="margin-top:12px" class="sub">詳細ボタンで予想内容を確認できます。</div><p class="sub warn">「本番」は実際の購入記録が確認できる場合だけ選択してください。区分変更は予想・結果を消しません。結果入力欄は従来どおり下にあります。</p></section><section id="output" class="hidden"><h2>予測ダッシュボード</h2><div class="two"><div><div class="sub">候補点数</div><div class="stat" id="points"></div></div><div><div class="sub">購入金額（参考）</div><div class="stat" id="cost"></div></div></div><p class="sub" id="coverage"></p><h2>レース評価</h2><div id="grades"></div><h2 style="margin-top:20px">人気の和の確率分布</h2><p class="sub">全入力馬の単勝オッズから推定。人気順位5〜90を集計。</p><div id="bands"></div><h2 style="margin-top:20px">推定確率上位32点</h2><div class="scroll"><table><thead><tr><th>順位</th><th>馬番（1→5R）</th><th>人気の和</th><th>推定確率</th></tr></thead><tbody id="tickets"></tbody></table></div><button onclick="savePrediction()">この予想を保存</button><button class="alt" onclick="exportTickets()">32点をCSV出力</button></section><section id="v32compare" class="hidden"><h2>Ver.37 | 32点モデル比較（検証用）</h2><p class="sub">A：従来の推定確率上位32点。B：人気の和の偏りを抑える探索的な32点。Bは人気の和の帯域ごとに候補を選びます。<strong>利益・的中率の改善を保証しません。</strong>通常の買い目CSVはAのみです。予想保存時にはA・B両方の32点を記録します。</p><div class="two"><div class="card" style="padding:12px;background:#edf3f7;border-radius:12px"><b>A：確率上位32点</b><div id="v32a"></div></div><div class="card" style="padding:12px;background:#edf3f7;border-radius:12px"><b>B：人気の和分散32点</b><div id="v32b"></div></div></div><p class="sub" id="v32note"></p><h3>人気の和の帯域別・買い目数</h3><div class="scroll"><table><thead><tr><th>人気の和</th><th>A</th><th>B</th></tr></thead><tbody id="v32bands"></tbody></table></div><h3>Bの買い目（比較検証用・通常CSVには含まれません）</h3><div class="scroll"><table><thead><tr><th>順位</th><th>馬番（1→5R）</th><th>人気の和</th><th>推定確率</th></tr></thead><tbody id="v32tickets"></tbody></table></div></section><section id="v33history"><h2>Ver.37｜モデルA・B 実績比較</h2><p class="sub">予想保存時にA・Bの32点を同時に固定し、結果登録後に照合します。過去のVer.32以前の予想はBの買い目が保存されていないため比較対象外です。架空テストと本番は分けて集計します。ここでの購入額・払戻額は両モデルをそれぞれ100円×32点で購入したと仮定したシミュレーションです。実際の購入履歴ではありません。</p><label for="v33filter">比較する区分</label><select id="v33filter" style="width:100%;padding:11px;border:1px solid #cbd5df;border-radius:8px" onchange="v33render()"><option value="paper">実開催・購入なし</option><option value="real">本番のみ</option><option value="test">テストのみ</option><option value="all">すべて（参考）</option></select><div id="v33stats" class="v30stats" style="margin-top:12px"></div><p class="sub" id="v33note"></p><div class="scroll"><table><thead><tr><th>開催日</th><th>区分</th><th>A結果</th><th>B結果</th><th>A収支</th><th>B収支</th></tr></thead><tbody id="v33rows"></tbody></table></div><button class="alt" type="button" onclick="v33csv()">A・B比較履歴をCSV出力</button></section><section><h2>結果入力・成績（下の簡易集計は全区分混合）</h2><p class="sub">予想を保存してから結果を入力。記録済みの結果は確認後に上書きできます。払戻金は100円的中時のWIN5公式払戻額を入力します。</p><div class="two"><div><label>結果の開催日</label><input type="date" id="resultDate"></div><div><label>払戻金（円）</label><input type="number" min="0" id="payout" placeholder="例 123456"></div></div><div id="winnerFields" class="two"></div><button onclick="recordResult()">結果を記録・修正</button><button class="alt" onclick="exportHistory()">履歴をCSV出力</button><div id="stats"></div></section><section><h2>データ管理</h2><button class="alt" onclick="backup()">全データをバックアップ</button><label>バックアップを復元（JSON）</label><input type="file" id="restore" accept=".json,application/json" onchange="restoreBackup(event)"><p class="sub warn">Safariの履歴・サイトデータを消去した場合や、別のブラウザで開いた場合、保存内容が引き継がれないことがあります。毎週バックアップを保存してください。</p></section></main><footer>推定確率は単勝オッズ逆数の正規化に基づくモデル値です。配当期待値・収益性は推定していません。購入は手動で判断してください。</footer><script>
+'use strict';const KEY='win5v23';let last=null;let calculatedFingerprint=null;let store;let storageAvailable=true;try{store=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){store={};storageAvailable=false}store.drafts??={};store.predictions??={};store.results??={};const $=id=>document.getElementById(id);const fmt=x=>(x*100).toFixed(3)+'%';function persist(){try{localStorage.setItem(KEY,JSON.stringify(store));storageAvailable=true;return true}catch(e){storageAvailable=false;alert('この環境では保存できません。SafariのHTTPSサイトで開き、JSONバックアップを利用してください。');return false}}function renderInputs(){let html='';for(let r=0;r<5;r++){html+=`<div class="race"><h3>第${r+1}レース <span id="grade${r}" class="tag">未計算</span></h3>`;for(let j=0;j<18;j++)html+=`<div class="horse"><span>${j+1}人気</span><input id="n${r}_${j}" type="number" inputmode="numeric" min="1" max="18" placeholder="馬番"><input id="o${r}_${j}" type="number" inputmode="decimal" min="1" step="0.1" placeholder="単勝オッズ"></div>`;html+='</div>'} $('races').innerHTML=html;let s='';for(let i=0;i<5;i++)s+=`<div><label>第${i+1}R 勝ち馬番</label><input id="w${i}" type="number" inputmode="numeric" min="1" max="18"></div>`;$('winnerFields').innerHTML=s}renderInputs();$('date').value=new Date().toLocaleDateString('sv-SE');$('resultDate').value=$('date').value;function readInputs(){const races=[];for(let r=0;r<5;r++){let a=[],seen=new Set(),blank=false;for(let j=0;j<18;j++){const ns=$(`n${r}_${j}`).value.trim(),os=$(`o${r}_${j}`).value.trim();if(!ns&&!os){blank=true;continue}if(!ns||!os)throw Error(`第${r+1}R ${j+1}人気の馬番・オッズを両方入力してください`);if(blank)throw Error(`第${r+1}Rは人気順に詰めて入力してください`);const n=Number(ns),o=Number(os);if(!Number.isInteger(n)||n<1||n>18||seen.has(n)||!Number.isFinite(o)||o<1)throw Error(`第${r+1}R ${j+1}人気の入力を確認してください`);if(a.length&&o<a[a.length-1].odds)throw Error(`第${r+1}Rのオッズが人気順ではありません`);seen.add(n);a.push({number:n,odds:o,rank:j+1})}if(a.length<2)throw Error(`第${r+1}Rは2頭以上入力してください`);const z=a.reduce((s,x)=>s+1/x.odds,0);a.forEach(x=>x.p=(1/x.odds)/z);races.push(a)}return races}function top32(races){let cur=[{p:1,nums:[],ranks:[]}];for(const race of races){let next=[];for(const prev of cur)for(const horse of race)next.push({p:prev.p*horse.p,nums:[...prev.nums,horse.number],ranks:[...prev.ranks,horse.rank]});next.sort((a,b)=>b.p-a.p);cur=next.slice(0,32)}return cur}function distribution(races){let dp=new Array(91).fill(0);dp[0]=1;for(const race of races){let next=new Array(91).fill(0);for(let s=0;s<=90;s++)if(dp[s])for(const h of race)if(s+h.rank<=90)next[s+h.rank]+=dp[s]*h.p;dp=next}return dp}function inputFingerprint(){const values=[$('date').value,$('obtained').value,$('deadline').value];for(let r=0;r<5;r++)for(let j=0;j<18;j++)values.push($(`n${r}_${j}`).value,$(`o${r}_${j}`).value);return JSON.stringify(values)}function calculate(){try{const date=$('date').value,obt=$('obtained').value,dl=$('deadline').value;if(!date||!obt||!dl)throw Error('開催日・オッズ取得日時・締切日時を入力してください');if(new Date(obt)>=new Date(dl))throw Error('オッズ取得日時が締切以降です。締切前のデータを使用してください');if(['real','paper'].includes($('mode28').value)&&(obt.slice(0,10)!==date||dl.slice(0,10)!==date))throw Error('本番予想では開催日・オッズ取得日・発売締切日を同じ日にしてください。');const races=readInputs(),tickets=top32(races),dp=distribution(races),grades=races.map(a=>{let ratio=a[1].odds/a[0].odds;return ratio>=3?'S':ratio>=2?'A':ratio>=1.5?'B':ratio>=1.3?'C':'D'});const cover=tickets.reduce((s,x)=>s+x.p,0);last={date,obt,dl,races,tickets,dp,grades,cover};calculatedFingerprint=inputFingerprint();$('output').classList.remove('hidden');$('points').textContent=tickets.length+'点';$('cost').textContent=(tickets.length*100).toLocaleString()+'円';$('coverage').textContent='全入力馬が出走馬を網羅している場合のモデル推定カバー率：'+fmt(cover)+'。これは実際の的中率ではありません。';$('grades').innerHTML=grades.map((g,i)=>`<span class="tag">第${i+1}R：${g}</span>`).join(' ');const bands=[[5,10],[11,15],[16,20],[21,25],[26,90]];$('bands').innerHTML=bands.map(([a,b])=>{let p=dp.slice(a,b+1).reduce((s,x)=>s+x,0);return `<div class="two" style="align-items:center;margin:9px 0"><span>${a}〜${b===90?'90':b}：${(p*100).toFixed(1)}%</span><div class="bar"><i style="width:${p*100}%"></i></div></div>`}).join('');$('tickets').innerHTML=tickets.map((x,i)=>`<tr><td>${i+1}</td><td>${x.nums.join(' - ')}</td><td>${x.ranks.reduce((a,b)=>a+b,0)}</td><td>${fmt(x.p)}</td></tr>`).join('');for(let i=0;i<5;i++)$(`grade${i}`).textContent=grades[i];$('msg').textContent='計算完了。保存ボタンで予想を確定してください';$('msg').className='ok';$('resultDate').value=date;$('output').scrollIntoView({behavior:'smooth'});}catch(e){$('msg').textContent=e.message;$('msg').className='warn'}}function saveDraft(silent=false){const a=[];for(let r=0;r<5;r++){let row=[];for(let j=0;j<18;j++)row.push([$(`n${r}_${j}`).value,$(`o${r}_${j}`).value]);a.push(row)}store.drafts[$('date').value]={a,obt:$('obtained').value,dl:$('deadline').value,helper28:{url:$('url27text').value,odds:$('odds27').value,race:$('url27race').value,mode:$('mode28').value}};const ok=persist();if(!silent&&ok)alert('入力を一時保存しました')}function restoreDraft(date){let d=store.drafts[date];if(!d)return;if(d.helper28){$('url27text').value=d.helper28.url||'';$('odds27').value=d.helper28.odds||'';$('url27race').value=d.helper28.race||'0';$('mode28').value=d.helper28.mode||'test'}$('obtained').value=d.obt;$('deadline').value=d.dl;for(let r=0;r<5;r++)for(let j=0;j<18;j++){const x=d.a[r][j];$(`n${r}_${j}`).value=x[0];$(`o${r}_${j}`).value=x[1]}}$('date').addEventListener('change',()=>{restoreDraft($('date').value);$('resultDate').value=$('date').value});let autosaveTimer;document.addEventListener('input',e=>{if(!['obtained','deadline','url27text','odds27','mode28','url27race'].includes(e.target.id)&&!/^([no]\d+_\d+)$/.test(e.target.id))return;clearTimeout(autosaveTimer);autosaveTimer=setTimeout(()=>{if($('date').value&&storageAvailable)saveDraft(true)},1800)});restoreDraft($('date').value);function savePrediction(){if(!last){alert('先に予測を計算してください');return}if(calculatedFingerprint!==inputFingerprint()){alert('予測後に入力内容が変わっています。再計算してから保存してください');return}if(['real','paper'].includes($('mode28').value)&&(last.obt.slice(0,10)!==last.date||last.dl.slice(0,10)!==last.date)){alert('本番予想の日付が一致しません。日付を修正して再計算してください。');return}const prior=store.predictions[last.date];const mode=document.getElementById('mode28').value; if(mode==='paper'&&(Date.now()>=new Date(last.dl).getTime()||Date.now()<new Date(last.obt).getTime())){alert('取得日時から締切までの間に保存してください');return} if(prior?.mode28==='paper'){alert('固定済みの実開催予測は更新できません');return} if(mode==='paper'&&prior){alert('同日の既存予測があります。上書きできません');return}
+if(prior){
+ if(store.results[last.date]){alert('この開催日は結果記録済みです。予想の更新はできません。');return}
+ const priorMode=prior.mode28==='real'?'本番':'テスト（旧版の保存は区分不明）';
+ if(!confirm('この開催日には保存済み予想があります（'+priorMode+'）。\\n更新すると以前の32点予想が置き換わります。\\n続けますか？'))return;
+ if(!confirm('最終確認：'+last.date+' の保存済み予想を、現在の'+(mode==='paper'?'実開催・購入なし':mode==='real'?'本番':'テスト')+'予想で更新しますか？'))return;
+}else if(!confirm((mode==='paper'?'実開催・購入なし':mode==='real'?'本番':'テスト')+'予想として '+last.date+' の32点を保存しますか？'))return;
+const next={...last,mode28:mode,savedAt28:new Date().toISOString(),v63:v62model(last.races)};
+ try{if(mode==='paper'){const saved=Date.parse(next.savedAt28);if(!(Date.parse(next.obt)<=saved&&saved<Date.parse(next.dl)))throw Error('締切前に保存できませんでした');next.v76=v76snapshot(next.races,next.v63)}next.v33=v33snapshot(next)}catch(e){alert('A・B比較データの生成に失敗したため保存しません: '+e.message);return}
+store.predictions[last.date]=next;
+if(!persist()){if(prior)store.predictions[last.date]=prior;else delete store.predictions[last.date];return}
+alert(prior?'保存済み予想を更新しました':'予想を保存しました。結果入力から照合できます');showStats();refresh28()}function recordResult(){const date=$('resultDate').value,p=store.predictions[date];if(!p){alert('この開催日の保存済み予想がありません');return}if(p.mode28==='paper'&&Date.now()<new Date(p.dl).getTime()){alert('締切後に結果を入力してください');return}const priorResult=store.results[date];const winners=[];for(let i=0;i<5;i++){const x=Number($(`w${i}`).value);if(!Number.isInteger(x)||x<1||x>18){alert('5レースの勝ち馬番を入力してください');return}winners.push(x)}const payout=Number($('payout').value);if($('payout').value===''||!Number.isSafeInteger(payout)||payout<0){alert('払戻金を入力してください');return}if(priorResult&&!confirm('記録済みの結果を修正しますか？\n開催日：'+date+'\n旧結果：'+priorResult.winners.join(' - ')+'／'+priorResult.payout+'円\n新結果：'+winners.join(' - ')+'／'+payout+'円\n保存済み予想は変更しません。'))return;const hit=p.tickets.some(t=>t.nums.every((x,i)=>x===winners[i]));const ranks=winners.map((n,i)=>p.races[i].find(h=>h.number===n)?.rank??null);store.results[date]={date,winners,payout,hit,ranks,stake:p.tickets.length*100,received:hit?payout:0,cover:p.cover};if(!persist()){if(priorResult)store.results[date]=priorResult;else delete store.results[date];return}alert((priorResult?'結果を修正しました：':'結果を記録しました：')+(hit?'A的中':'A不的中'));showStats()}function showStats(){const a=Object.values(store.results).filter(r=>store.predictions[r.date]?.mode28!=='paper');if(!a.length){$('stats').innerHTML='<p class="sub">まだ結果記録はありません。</p>';return}const stake=a.reduce((s,x)=>s+x.stake,0),received=a.reduce((s,x)=>s+x.received,0),hits=a.filter(x=>x.hit).length,expected=a.reduce((s,x)=>s+x.cover,0);$('stats').innerHTML=`<p><strong>${a.length}開催 / ${hits}回的中</strong></p><p class="sub">的中率 ${(hits/a.length*100).toFixed(2)}% ・ 予測的中回数 ${expected.toFixed(2)}回<br>購入合計 ${stake.toLocaleString()}円 ・ 払戻合計 ${received.toLocaleString()}円<br>回収率 ${(received/stake*100).toFixed(1)}% ・ 収支 ${(received-stake).toLocaleString()}円</p>`}showStats();function download(name,data,type){const blob=new Blob([data],{type});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000)}function exportTickets(){if(!last)return;const rows=[['順位','開催日','第1R','第2R','第3R','第4R','第5R','人気の和','推定確率'],...last.tickets.map((t,i)=>[i+1,last.date,...t.nums,t.ranks.reduce((a,b)=>a+b,0),t.p])];download(`win5_${last.date}_32.csv`,'\ufeff'+rows.map(x=>x.join(',')).join('\r\n'),'text/csv;charset=utf-8')}function exportHistory(){const rows=[['開催日','的中','購入額','払戻額','収支','予測カバー率','実際の人気の和'],...Object.values(store.results).map(x=>[x.date,x.hit?1:0,x.stake,x.received,x.received-x.stake,x.cover,x.ranks.every(n=>n!==null)?x.ranks.reduce((a,b)=>a+b,0):'未収録'])];download('win5_history.csv','\ufeff'+rows.map(x=>x.join(',')).join('\r\n'),'text/csv;charset=utf-8')}function backup(){download('win5_backup.json',JSON.stringify(store,null,2),'application/json')}function restoreBackup(e){const f=e.target.files[0];if(!f)return;const reader=new FileReader();reader.onload=()=>{try{const x=JSON.parse(reader.result);if(!x.predictions||!x.results)throw Error('不正なファイル');if(!confirm('現在の保存データをバックアップ内容で置き換えますか？'))return;store=x;persist();showStats();alert('復元しました')}catch(err){alert('バックアップを読み込めませんでした')}};reader.readAsText(f)}function loadDemo(){if(!confirm('入力欄をサンプルデータで置き換えますか？'))return;for(let r=0;r<5;r++)for(let j=0;j<18;j++){let enabled=j<8;$(`n${r}_${j}`).value=enabled?j+1:'';$(`o${r}_${j}`).value=enabled?(2.5+j*2.8+r*.2).toFixed(1):''}const d=$('date').value;$('obtained').value=d+'T12:00';$('deadline').value=d+'T14:00';$('msg').textContent='サンプルデータを入力しました。実際のレースには使用しないでください'}
+
+window.addEventListener('error',function(e){const m=document.getElementById('msg');if(m){m.textContent='エラー: '+(e.message||'不明なエラー');m.className='warn'}});
+
+try{document.getElementById('runtime').textContent='JavaScript起動済み｜'+(location.protocol==='https:'?'HTTPSサイト':'ローカル/プレビュー表示（保存・計算が制限される場合あり）')+(storageAvailable?'｜保存機能利用可':'｜保存機能制限あり')}catch(e){}
+</script><script>
+/* Ver.26: netkeiba paste import. No network requests or scraping. */
+let pendingImport=null;
+function parseNetkeiba(text){
+  const out=[], rejected=[];
+  const lines=text.replace(/\r/g,'').split('\n');
+  for(let i=0;i<lines.length;i++){
+    const line=lines[i].trim();if(!line)continue;
+    if(/取消|除外|出走取消|競走除外/.test(line)){rejected.push(i+1);continue}
+    let fields=line.split(/\t+/).map(x=>x.trim()).filter(Boolean);
+    let number,odds,rank,name='';
+    if(fields.length>=4){
+      // netkeiba table: frame, horse number, marks, name, ..., odds, popularity, favorites
+      const leading=fields.slice(0,3).map(x=>/^\d{1,2}$/.test(x)?Number(x):null);
+      if(leading[0]!==null&&leading[1]!==null)number=leading[1];
+      else if(leading[0]!==null)number=leading[0];
+      const candidates=[];
+      for(let k=2;k<fields.length;k++){
+        if(/^\d+(?:\.\d+)?$/.test(fields[k])){
+          const o=Number(fields[k]);const n=Number(fields[k+1]);
+          if(o>=1&&o<=9999&&Number.isInteger(n)&&n>=1&&n<=18&&/^\d{1,2}$/.test(fields[k+1]))candidates.push({odds:o,rank:n,k});
+        }
+      }
+      if(candidates.length){const c=candidates[candidates.length-1];odds=c.odds;rank=c.rank}
+      name=fields.find(x=>/[ぁ-んァ-ヶ一-龯]/.test(x)&&!/(?:取消|除外)/.test(x))||'';
+    }
+    if(number===undefined||odds===undefined){
+      // compact lines: '13 マリアイリダータ 3.3 1' or '13 3.3 1'
+      const m=line.match(/^\s*(\d{1,2})\s+(.+?)\s+(\d+(?:\.\d+)?)\s+(\d{1,2})\s*$/);
+      if(m){number=Number(m[1]);name=m[2];odds=Number(m[3]);rank=Number(m[4])}
+    }
+    if(Number.isInteger(number)&&number>=1&&number<=18&&Number.isFinite(odds)&&odds>=1&&Number.isInteger(rank)&&rank>=1&&rank<=18)out.push({number,odds,rank,name,line:i+1});
+  }
+  if(!out.length)throw Error('馬番・オッズ・人気を読み取れませんでした。表の「馬番〜人気」列を含めてコピーしてください。');
+  const numbers=new Set(),ranks=new Set();for(const h of out){if(numbers.has(h.number)||ranks.has(h.rank))throw Error('同じ馬番または人気順位が重複しています。コピーした範囲を確認してください。');numbers.add(h.number);ranks.add(h.rank)}
+  out.sort((a,b)=>a.rank-b.rank);
+  for(let i=0;i<out.length;i++){
+    if(out[i].rank!==i+1)throw Error('人気順位が1位から連続していません（'+out.map(x=>x.rank).join(',')+'）。全頭分をコピーするか、表の形式を確認してください。');
+    if(i&&out[i].odds<out[i-1].odds)throw Error('人気順位とオッズの順序が一致しません。コピー内容を確認してください。');
+  }
+  if(out.length>18)throw Error('18頭を超えています。1レース分だけコピーしてください。');
+  return {horses:out,rejected};
+}
+function previewNetkeiba(){
+  const feedback=document.getElementById('pasteFeedback'),preview=document.getElementById('pastePreview');
+  pendingImport=null;document.getElementById('pasteApply').style.display='none';preview.innerHTML='';
+  try{
+    const data=parseNetkeiba(document.getElementById('pasteText').value);
+    pendingImport={race:Number(document.getElementById('pasteRace').value),horses:data.horses};
+    feedback.textContent=data.horses.length+'頭を解析しました。'+(data.rejected.length?'取消・除外行を除外しました。':'')+' 下の表をnetkeibaと照合してから反映してください。';feedback.className='ok';
+    const table=document.createElement('table');const head=document.createElement('thead');head.innerHTML='<tr><th>人気</th><th>馬番</th><th>馬名（参考）</th><th>単勝オッズ</th></tr>';table.append(head);
+    const body=document.createElement('tbody');data.horses.forEach(h=>{const tr=document.createElement('tr');[h.rank,h.number,h.name,h.odds].forEach(v=>{const td=document.createElement('td');td.textContent=String(v);tr.append(td)});body.append(tr)});table.append(body);preview.append(table);
+    document.getElementById('pasteApply').style.display='inline-block';
+  }catch(e){feedback.textContent=e.message;feedback.className='warn'}
+}
+function applyNetkeiba(){
+  if(!pendingImport)return;
+  const r=pendingImport.race,hs=pendingImport.horses;
+  const existing=Array.from({length:18},(_,j)=>document.getElementById('n'+r+'_'+j).value||document.getElementById('o'+r+'_'+j).value).some(Boolean);
+  if(existing&&!confirm('第'+(r+1)+'レースの既存入力を上書きしますか？'))return;
+  for(let j=0;j<18;j++){
+    document.getElementById('n'+r+'_'+j).value=hs[j]?hs[j].number:'';
+    document.getElementById('o'+r+'_'+j).value=hs[j]?hs[j].odds:'';
+  }
+  last=null;calculatedFingerprint=null;document.getElementById('output').classList.add('hidden');
+  if(document.getElementById('date').value)saveDraft(true);
+  document.getElementById('pasteFeedback').textContent='第'+(r+1)+'レースに'+hs.length+'頭を反映しました。残りのレースも取り込み、最後に「予測を計算」を押してください。';
+  document.getElementById('pasteApply').style.display='none';pendingImport=null;
+}
+function pasteExample(){
+  document.getElementById('pasteText').value='7\t13\tマリアイリダータ\t3.3\t1\n6\t11\tフォルテアンジェロ\t6.7\t2\n8\t15\tキャントウェイト\t6.8\t3\n1\t1\tカラマティアノス\t7.9\t4\n4\t8\tヨヒーン\t9.1\t5';
+  previewNetkeiba();
+}
+</script><script>
+/* Ver.27 experimental helper: no remote fetching, no cross-origin requests. */
+let ready27=null;
+function identify27(){
+ const el=document.getElementById('url27status');
+ try{
+  const raw=document.getElementById('url27text').value.trim();if(!raw){el.textContent='URL未入力：テスト・手入力モードで進められます。';el.className='sub';return null}const u=new URL(raw);
+  if(u.protocol!=='https:'||u.hostname!=='race.netkeiba.com'||!/^\/race\/(?:shutuba|odds|result|race)\.html$/.test(u.pathname))throw Error('netkeibaの出馬表URLを貼り付けてください。');
+  const id=u.searchParams.get('race_id');if(!/^\d{12}$/.test(id||''))throw Error('12桁のレースIDが見つかりません。');
+  el.textContent='レースID: '+id+' を確認しました。出馬表を見ながら下の欄に馬番と単勝オッズを入力してください。';el.className='ok';return id;
+ }catch(e){el.textContent=e.message;el.className='warn';return null}
+}
+function open27(){const id=identify27();if(id)window.open('https://race.netkeiba.com/race/shutuba.html?race_id='+id,'_blank','noopener,noreferrer')}
+function preview27(){
+ ready27=null;document.getElementById('apply27').style.display='none';const target=document.getElementById('preview27');target.textContent='';
+ try{
+  const rawUrl=document.getElementById('url27text').value.trim();const id=rawUrl?identify27():null;if(rawUrl&&!id)throw Error('URLを確認してください。URLなしの場合は欄を空にしてください。');
+  const lines=document.getElementById('odds27').value.trim().split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+  if(lines.length<2||lines.length>18)throw Error('2〜18頭分のデータを入力してください。');
+  const horses=[],used=new Set();let prev=0;
+  for(let i=0;i<lines.length;i++){
+   const m=lines[i].match(/^(\d{1,2})[\s,，:：]+(\d+(?:\.\d+)?)$/);
+   if(!m)throw Error((i+1)+'行目は「馬番 オッズ」の形式で入力してください。');
+   const no=Number(m[1]),odds=Number(m[2]);
+   if(no<1||no>18||used.has(no)||odds<1.01||odds>9999||odds<prev)throw Error((i+1)+'行目の馬番重複・オッズ順序・値を確認してください。');
+   used.add(no);prev=odds;horses.push({no,odds});
+  }
+  const race=Number(document.getElementById('url27race').value);ready27={id,race,horses};
+  const table=document.createElement('table');const head=document.createElement('thead');head.innerHTML='<tr><th>人気</th><th>馬番</th><th>単勝オッズ</th></tr>';table.append(head);const body=document.createElement('tbody');
+  horses.forEach((h,i)=>{const tr=document.createElement('tr');[i+1,h.no,h.odds].forEach(v=>{const td=document.createElement('td');td.textContent=String(v);tr.append(td)});body.append(tr)});table.append(body);
+  target.append(table);const p=document.createElement('p');p.className='warn';p.textContent=horses.length+'頭です。出走頭数・取消馬・人気順をnetkeibaで照合してから反映してください。';target.prepend(p);
+  document.getElementById('apply27').style.display='inline-block';
+ }catch(e){target.textContent=e.message;target.className='warn'}
+}
+function apply27(){
+ if(!ready27)return;const {race,horses,id}=ready27;
+ const filled=Array.from({length:18},(_,j)=>document.getElementById('n'+race+'_'+j).value||document.getElementById('o'+race+'_'+j).value).some(Boolean);
+ if(filled&&!confirm('第'+(race+1)+'レースの入力を上書きしますか？'))return;
+ for(let j=0;j<18;j++){document.getElementById('n'+race+'_'+j).value=horses[j]?horses[j].no:'';document.getElementById('o'+race+'_'+j).value=horses[j]?horses[j].odds:''}
+ last=null;calculatedFingerprint=null;document.getElementById('output').classList.add('hidden');
+ if(document.getElementById('date').value)saveDraft(true);
+ document.getElementById('preview27').textContent='第'+(race+1)+'レースに'+horses.length+'頭を反映しました（'+(id?'レースID '+id:'URLなし')+'）。';document.getElementById('apply27').style.display='none';ready27=null;
+}
+</script><script>
+/* Ver.28: safe saved-prediction management; existing storage key is intentionally unchanged. */
+function refresh28(){
+ const date=document.getElementById('date').value, el=document.getElementById('saved28');
+ const p=store.predictions[date],res=store.results[date];
+ if(!p){el.textContent='この開催日の保存済み予想はありません。';return}
+ const mode=p.mode28==='test'?'テスト用':p.mode28==='real'?'本番用':'旧版保存（区分不明）';
+ el.textContent='保存済み：'+date+' ／ '+mode+' ／ '+(p.tickets?.length||0)+'点'+(res?' ／ 結果記録済み・更新不可':' ／ 確認後に更新可能');
+}
+function check28(){
+ const out=document.getElementById('check28out');
+ const rows=[];
+ for(let r=0;r<5;r++){
+  const horses=[],used=new Set();let issue='';
+  for(let j=0;j<18;j++){
+   const n=document.getElementById('n'+r+'_'+j).value, o=document.getElementById('o'+r+'_'+j).value;
+   if(!n&&!o)continue;
+   if(!n||!o){issue='馬番またはオッズが未入力';continue}
+   if(used.has(n))issue='馬番の重複';
+   used.add(n);horses.push(n);
+  }
+  rows.push('第'+(r+1)+'R：'+horses.length+'頭'+(issue?'（注意：'+issue+'）':'')+' ／ 人気1位の馬番：'+(horses[0]||'未入力'));
+ }
+ out.textContent=rows.join('\\n')+'\\n※入力頭数が実際の出走頭数と一致するか確認してください。';
+ out.style.whiteSpace='pre-line';
+}
+document.getElementById('date').addEventListener('change',refresh28);
+document.getElementById('mode28').addEventListener('change',()=>{if(document.getElementById('date').value)saveDraft(true)});
+document.getElementById('url27race').addEventListener('change',()=>{if(document.getElementById('date').value)saveDraft(true)});
+refresh28();
+</script><script id="v30script">
+(function(){
+'use strict';
+const el=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=n=>Number(n||0).toLocaleString('ja-JP')+'円';
+function mode(p){return p.mode30||p.mode29||p.mode28||'unknown'}
+function modeLabel(m){return m==='paper'?'購入なし':m==='real'?'本番':m==='test'?'テスト':'未分類'}
+window.v30Render=function(){
+ const filter=el('v30filter').value, entries=Object.entries(store.predictions||{}).sort((a,b)=>b[0].localeCompare(a[0]));
+ const results=entries.filter(([date,p])=>store.results?.[date]&&(filter==='all'||mode(p)===filter));
+ let stake=0,paid=0,hits=0,expected=0;
+ for(const [date,p] of results){const r=store.results[date];stake+=Number(r.stake||0);paid+=Number(r.received||0);hits+=r.hit?1:0;expected+=Number(r.cover??p.cover??0)}
+ const stats=[['結果記録開催数',results.length],['的中開催数',hits],['的中率',results.length?(hits/results.length*100).toFixed(2)+'%':'—'],['仮想購入額',money(stake)],['仮想払戻額',money(paid)],['収支',money(paid-stake)],['回収率',stake?(paid/stake*100).toFixed(1)+'%':'—'],['モデル予測的中回数',expected.toFixed(2)+'回']];
+ el('v30stats').innerHTML=stats.map(([k,v])=>'<div class="v30stat"><span>'+esc(k)+'</span><b>'+esc(v)+'</b></div>').join('');
+ el('v30notes').textContent='結果記録済みの開催だけを集計。モデル予測的中回数は保存済みカバー率の合計で、実際の的中回数とは異なります。';
+ el('v30rows').innerHTML=entries.map(([date,p])=>{const r=store.results?.[date],m=mode(p),points=p.tickets?.length||0;return '<tr><td>'+esc(date)+'</td><td><select aria-label="'+esc(date)+'の区分" data-date="'+esc(date)+'" onchange="v30ChangeMode(this)"><option value="paper" disabled '+(m==='paper'?'selected':'')+'>購入なし</option><option value="unknown" '+(m==='unknown'?'selected':'')+'>未分類</option><option value="test" '+(m==='test'?'selected':'')+'>テスト</option><option value="real" '+(m==='real'?'selected':'')+'>本番</option></select></td><td>'+points+'</td><td>'+(r?(r.hit?'的中':'不的中'):'未記録')+'</td><td>'+(r?money(Number(r.received||0)-Number(r.stake||0)):'—')+'</td><td><button type="button" class="alt" data-date="'+esc(date)+'" onclick="v30Detail(this.dataset.date)">詳細</button></td></tr>'}).join('')||'<tr><td colspan="6">保存済み予想はありません</td></tr>';
+};
+window.v30ChangeMode=function(sel){const date=sel.dataset.date,p=store.predictions[date];if(!p)return;if(p.mode28==='paper'){alert('固定済み検証の区分は変更できません');v30Render();return}const old=mode(p),next=sel.value;if(next==='real'&&!confirm(date+' を本番にしますか？ 実際に購入した記録がある場合のみ本番にしてください。')){sel.value=old;return}if(!confirm(date+' の区分を「'+modeLabel(next)+'」に変更しますか？')){sel.value=old;return}p.mode30=next;if(!persist()){if(old==='unknown')delete p.mode30;else p.mode30=old;sel.value=old;return}v30Render()};
+window.v30Detail=function(date){const p=store.predictions[date],r=store.results?.[date];if(!p)return;const lines=(p.tickets||[]).map((t,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc((t.nums||[]).join(' - '))+'</td><td>'+esc((Number(t.p||0)*100).toFixed(3))+'%</td></tr>').join('');el('v30detail').innerHTML='<h3>'+esc(date)+'｜'+modeLabel(mode(p))+'</h3><p>取得：'+esc(p.obt)+'　締切：'+esc(p.dl)+'</p><p>推定カバー率：'+(Number(p.cover||0)*100).toFixed(3)+'%　結果：'+(r?(r.hit?'的中':'不的中'):'未記録')+'</p><div class="scroll"><table><thead><tr><th>順位</th><th>馬番（1〜5R）</th><th>モデル確率</th></tr></thead><tbody>'+lines+'</tbody></table></div>';el('v30detail').scrollIntoView({behavior:'smooth',block:'nearest'})};
+// Wrap existing actions; retain Ver.28 calculation, storage schema and JSON backup.
+for(const name of ['savePrediction','recordResult','restoreBackup']){const original=window[name];if(typeof original==='function')window[name]=function(...args){const ret=original.apply(this,args);v30Render();if(name==='restoreBackup')setTimeout(v30Render,400);return ret}}
+// Existing Ver.28 backup reads the same store object. Export both original and new classification.
+window.v30Render();
+})();
+</script><script>
+function fill31All(){
+ const mode=document.getElementById('mode28');
+ if(!mode||mode.value!=='test'){alert('この機能は「テスト用」のときだけ利用できます。予想区分をテスト用に変更してください。');return}
+ if(!document.getElementById('date').value){alert('先に開催日を設定してください。');return}
+ preview27();
+ if(!ready27){alert('オッズ入力を確認してください。');return}
+ const horses=ready27.horses;
+ if(!confirm('【架空データ専用】'+horses.length+'頭の同じオッズを5レースすべてに入力します。既存の入力も上書きします。続けますか？'))return;
+ for(let r=0;r<5;r++)for(let j=0;j<18;j++){
+  document.getElementById('n'+r+'_'+j).value=horses[j]?horses[j].no:'';
+  document.getElementById('o'+r+'_'+j).value=horses[j]?horses[j].odds:'';
+ }
+ last=null;calculatedFingerprint=null;document.getElementById('output').classList.add('hidden');
+ saveDraft(true);document.getElementById('preview27').textContent='テスト用データを5レースに反映しました。予測計算前に開催日と予想区分を確認してください。';
+ document.getElementById('apply27').style.display='none';ready27=null;
+}
+
+// Ver.32 comparison is display-only. The legacy saved prediction format and top32() are untouched.
+function v32rankSum(t){return t.ranks.reduce((a,b)=>a+b,0)}
+function v32band(t){const n=v32rankSum(t);return n<=10?0:n<=15?1:n<=20?2:n<=25?3:4}
+function v32pool(races){let cur=[{p:1,nums:[],ranks:[]}];for(const race of races){let next=[];for(const prev of cur)for(const horse of race)next.push({p:prev.p*horse.p,nums:[...prev.nums,horse.number],ranks:[...prev.ranks,horse.rank]});next.sort((a,b)=>b.p-a.p);cur=next.slice(0,3000)}return cur}
+function v32alternative(races,baseline){const pool=v32pool(races);const selected=[];const seen=new Set();const counts=[0,0,0,0,0];const baseCount=[0,0,0,0,0];baseline.forEach(t=>baseCount[v32band(t)]++);
+// Exploration policy: reserve up to 4 slots for each available nonempty rank-sum band,
+// then fill remaining slots by model probability, with a soft preference for underrepresented bands.
+for(let b=0;b<5;b++){const band=pool.filter(t=>v32band(t)===b);for(const t of band.slice(0,Math.min(4,band.length))){const k=t.nums.join(',');if(!seen.has(k)){selected.push(t);seen.add(k);counts[b]++}}}
+while(selected.length<32){let best=null,bestScore=-1;for(const t of pool){const k=t.nums.join(',');if(seen.has(k))continue;const b=v32band(t);const score=t.p/(1+counts[b]*0.10);if(score>bestScore){bestScore=score;best=t}}if(!best)break;selected.push(best);seen.add(best.nums.join(','));counts[v32band(best)]++}return selected.sort((a,b)=>b.p-a.p)}
+function v32render(){const el=document.getElementById('v32compare');if(!el||!last)return;const a=last.tickets,b=v32alternative(last.races,a),cover=ts=>ts.reduce((sum,t)=>sum+t.p,0),ca=cover(a),cb=cover(b);const n=ts=>ts.map(v32band).reduce((acc,x)=>(acc[x]++,acc),[0,0,0,0,0]);const na=n(a),nb=n(b);const overlap=b.filter(t=>a.some(u=>u.nums.join(',')===t.nums.join(','))).length;
+document.getElementById('v32a').textContent='32点 / 推定カバー率 '+fmt(ca);
+document.getElementById('v32b').textContent=b.length+'点 / 推定カバー率 '+fmt(cb);
+document.getElementById('v32note').textContent='共通買い目 '+overlap+'点 / 差分 '+(32-overlap)+'点。モデル上のカバー率差（B−A）：'+((cb-ca)*100).toFixed(3)+'ポイント。Bは分散の比較用で、モデル推定カバー率が低くなることがあります。オッズが全出走馬を網羅していない場合、どちらの数値も限定的です。';
+document.getElementById('v32bands').innerHTML=['5〜10','11〜15','16〜20','21〜25','26〜90'].map((x,i)=>'<tr><td>'+x+'</td><td>'+na[i]+'</td><td>'+nb[i]+'</td></tr>').join('');
+document.getElementById('v32tickets').innerHTML=b.map((t,i)=>'<tr><td>'+(i+1)+'</td><td>'+t.nums.join(' - ')+'</td><td>'+v32rankSum(t)+'</td><td>'+fmt(t.p)+'</td></tr>').join('');el.classList.remove('hidden')}
+const v32oldCalculate=calculate;calculate=function(){v32oldCalculate();if(last&&document.getElementById('output')&&!document.getElementById('output').classList.contains('hidden')){try{v32render()}catch(e){document.getElementById('v32note').textContent='比較表示エラー: '+e.message}}};
+
+// Ver.33: immutable per-save B snapshots, no retroactive reconstruction of old forecasts.
+function esc(s){return String(s??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]))}
+function v33match(t,w){return Array.isArray(t?.nums)&&t.nums.length===5&&t.nums.every((x,i)=>Number(x)===Number(w[i]))}
+function v33mode(p){return p.mode30||p.mode29||p.mode28||'unknown'}
+function v33yen(x){return Math.round(x).toLocaleString('ja-JP')+'円'}
+function v33snapshot(p){
+ const b=v32alternative(p.races,p.tickets);
+ if(b.length!==32)throw Error('Bの候補が32点に達しませんでした');
+ return {version:33,algorithm:'v32-band-diversification-v1',savedAt:p.savedAt28,
+  a:p.tickets.map(t=>({nums:t.nums.slice(),p:t.p})),
+  b:b.map(t=>({nums:t.nums.slice(),p:t.p})),
+  aCover:p.tickets.reduce((v,t)=>v+t.p,0),bCover:b.reduce((v,t)=>v+t.p,0)};
+}
+// Ver.34: A/B snapshots are committed atomically inside the original savePrediction().
+// No second persist() call, so a failed save cannot leave an A-only prediction.
+const v34oldSave=savePrediction;
+savePrediction=function(){v34oldSave();v33render()};
+const v33oldResult=recordResult;
+recordResult=function(){v33oldResult();v33render()};
+function v33rows(){
+ return Object.entries(store.predictions||{}).filter(([date,p])=>p.v33?.version===33&&Array.isArray(p.v33.a)&&Array.isArray(p.v33.b)&&p.v33.a.length===32&&p.v33.b.length===32)
+ .sort((a,b)=>b[0].localeCompare(a[0])).map(([date,p])=>{
+ const r=store.results?.[date],w=r?.winners,valid=Array.isArray(w)&&w.length===5;
+ const a=valid?v33matchAny(p.v33.a,w):null,b=valid?v33matchAny(p.v33.b,w):null;
+ const payout=Number(r?.payout||0),stake=3200;
+ return {date,mode:v33mode(p),result:valid,a,b,stake,payout,profitA:valid?(a?payout:0)-stake:null,profitB:valid?(b?payout:0)-stake:null};
+ });
+}
+function v33matchAny(tickets,w){return tickets.some(t=>v33match(t,w))}
+function v33render(){
+ const target=document.getElementById('v33stats');if(!target)return;
+ const filter=document.getElementById('v33filter').value;
+ const all=v33rows(), rows=all.filter(x=>filter==='all'||x.mode===filter),done=rows.filter(x=>x.result);
+ const count=done.length,ha=done.filter(x=>x.a).length,hb=done.filter(x=>x.b).length;
+ const stake=done.reduce((s,x)=>s+x.stake,0),pa=done.reduce((s,x)=>s+(x.a?x.payout:0),0),pb=done.reduce((s,x)=>s+(x.b?x.payout:0),0);
+ const stat=(name,value)=>'<div class="v30stat"><span>'+name+'</span><b>'+value+'</b></div>';
+ target.innerHTML=stat('比較可能な結果登録開催',count+'開催')+stat('A的中 / B的中',ha+'回 / '+hb+'回')+stat('A回収率 / B回収率',stake?(pa/stake*100).toFixed(1)+'% / '+(pb/stake*100).toFixed(1)+'%':'—')+stat('A収支 / B収支',v33yen(pa-stake)+' / '+v33yen(pb-stake));
+ document.getElementById('v33note').textContent='A・Bそれぞれの仮想購入額：'+v33yen(stake)+'。結果未記録は成績集計から除外。比較可能な保存済み予想 '+rows.length+'件。旧版のBは後付け生成せず除外します。';
+ const label=x=>x==='paper'?'購入なし':x==='real'?'本番':x==='test'?'テスト':'未分類';
+ document.getElementById('v33rows').innerHTML=rows.map(x=>'<tr><td>'+esc(x.date)+'</td><td>'+label(x.mode)+'</td><td>'+(x.result?(x.a?'的中':'不的中'):'未記録')+'</td><td>'+(x.result?(x.b?'的中':'不的中'):'未記録')+'</td><td>'+(x.result?v33yen(x.profitA):'—')+'</td><td>'+(x.result?v33yen(x.profitB):'—')+'</td></tr>').join('')||'<tr><td colspan="6">Ver.33で保存した比較対象予想はありません</td></tr>';
+}
+function v33csv(){const filter=document.getElementById('v33filter').value;const rows=v33rows().filter(x=>filter==='all'||x.mode===filter);const csv=[['開催日','区分','結果記録','A的中','B的中','各モデル購入額','公式払戻額','A仮想収支','B仮想収支'],...rows.map(x=>[x.date,x.mode,x.result?1:0,x.result?(x.a?1:0):'',x.result?(x.b?1:0):'',x.result?x.stake:'',x.result?x.payout:'',x.result?x.profitA:'',x.result?x.profitB:''])];download('win5_ver33_model_comparison.csv','\uFEFF'+csv.map(r=>r.join(',')).join('\r\n'),'text/csv;charset=utf-8')}
+const v33oldChange=window.v30ChangeMode;
+if(typeof v33oldChange==='function')window.v30ChangeMode=function(...args){const ret=v33oldChange.apply(this,args);v33render();return ret};
+const v33oldRestore=restoreBackup;
+restoreBackup=function(...args){const ret=v33oldRestore.apply(this,args);setTimeout(v33render,500);return ret};
+v33render();
+
+
+// Ver.37: Show saved A and B snapshots in the existing details view.
+window.v30Detail=function(date){
+ const p=store.predictions?.[date],r=store.results?.[date];if(!p)return;
+ const esc35=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const makeTable=(tickets)=>'<div class="scroll"><table><thead><tr><th>順位</th><th>馬番（1〜5R）</th><th>モデル確率</th></tr></thead><tbody>'+tickets.map((t,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc35((t.nums||[]).join(' - '))+'</td><td>'+esc35((Number(t.p||0)*100).toFixed(3))+'%</td></tr>').join('')+'</tbody></table></div>';
+ const a=Array.isArray(p.v33?.a)?p.v33.a:(p.tickets||[]),b=Array.isArray(p.v33?.b)?p.v33.b:null;
+ const cover=ts=>ts.reduce((s,t)=>s+Number(t.p||0),0)*100;
+ let html='<h3>'+esc35(date)+'｜'+esc35(modeLabel(mode(p)))+'</h3><p>取得：'+esc35(p.obt)+'　締切：'+esc35(p.dl)+'</p><p>結果：'+(r?(r.hit?'A的中':'A不的中'):'未記録')+'</p>';
+ html+='<h3>モデルA：確率上位32点（保存済み）</h3><p>推定カバー率：'+cover(a).toFixed(3)+'%／'+a.length+'点</p>'+makeTable(a);
+ if(b){html+='<h3>モデルB：人気の和分散32点（保存済み）</h3><p>推定カバー率：'+cover(b).toFixed(3)+'%／'+b.length+'点</p>'+makeTable(b)}
+ else html+='<p class="warn">この保存記録にはモデルBの買い目がありません。旧版の予想には後からBを追加しません。</p>';
+ document.getElementById('v30detail').innerHTML=html;
+ document.getElementById('v30detail').scrollIntoView({behavior:'smooth',block:'start'});
+};
+(function(){
+const section=document.createElement('section');section.id='v37analysis';section.innerHTML='<h2>Ver.37｜長期検証ダッシュボード</h2><p class="sub">A・B保存済みの同一開催を比較。仮想収支であり実購入額ではありません。架空テストは別集計です。</p><label>分析区分</label><select id="v37filter"><option value="paper">実開催・購入なし</option><option value="real">本番のみ</option><option value="test">テストのみ</option></select><div id="v37body"></div>';
+const anchor=document.getElementById('v33stats').closest('section');anchor.after(section);
+const bands=[[5,10],[11,15],[16,20],[21,25],[26,90]];
+function chart(title,a,b,percent){const vals=[0,...a,...b],lo=percent?0:Math.min(...vals),hi=percent?100:Math.max(...vals),span=hi-lo||1;const y=v=>155-(v-lo)/span*130;const x=i=>70+i*250/Math.max(1,a.length);const line=(v,c)=>'<polyline fill="none" stroke="'+c+'" stroke-width="2" points="'+[0,...v].map((n,i)=>x(i)+','+y(n)).join(' ')+'"/>'+v.map((n,i)=>'<circle cx="'+x(i+1)+'" cy="'+y(n)+'" r="3" fill="'+c+'"/>').join('');return '<h3>'+title+'</h3><p class="sub">青：A ／ 橙：B</p><svg role="img" aria-label="'+title+'" viewBox="0 0 340 185" style="width:100%;height:auto"><line x1="70" x2="320" y1="'+y(0)+'" y2="'+y(0)+'" stroke="#aab7c1"/>'+[lo,hi].map(v=>'<text x="65" y="'+(y(v)+4)+'" text-anchor="end" font-size="10" fill="currentColor">'+Math.round(v).toLocaleString()+(percent?'%':'')+'</text>').join('')+line(a,'#176389')+line(b,'#bd651d')+'<text x="70" y="177" font-size="11" fill="currentColor">開始</text><text x="320" y="177" text-anchor="end" font-size="11" fill="currentColor">'+a.length+'開催</text></svg>'}
+function render(){const filter=document.getElementById('v37filter').value,rows=v33rows().filter(x=>x.mode===filter&&x.result).sort((a,b)=>a.date.localeCompare(b.date));const target=document.getElementById('v37body');if(!rows.length){target.innerHTML='<p class="sub">比較可能な結果記録はありません。</p>';return}let pa=0,pb=0,ha=0,hb=0,ea=0,eb=0,missing=0;const ca=[],cb=[],ra=[],rb=[],counts=[0,0,0,0,0],ranks=Array.from({length:5},()=>[0,0,0,0,0]);for(const [i,x] of rows.entries()){pa+=x.profitA;pb+=x.profitB;ha+=Number(x.a);hb+=Number(x.b);ca.push(pa);cb.push(pb);ra.push(100*ha/(i+1));rb.push(100*hb/(i+1));const p=store.predictions[x.date],r=store.results[x.date];ea+=p.v33.a.reduce((s,t)=>s+t.p,0);eb+=p.v33.b.reduce((s,t)=>s+t.p,0);const rr=r.winners.map((n,j)=>p.races?.[j]?.find(h=>Number(h.number)===Number(n))?.rank);rr.forEach((n,j)=>ranks[j][!Number.isInteger(n)?4:n===1?0:n<=3?1:n<=5?2:3]++);if(rr.every(n=>Number.isInteger(n)&&n>=1&&n<=18)){const sum=rr.reduce((s,n)=>s+n,0);counts[bands.findIndex(([a,b])=>sum>=a&&sum<=b)]++}else missing++}target.innerHTML='<p>'+rows.length+'開催（結果記録済み）</p>'+chart('累積仮想収支（円）',ca,cb,false)+chart('累積的中率（%）',ra,rb,true)+'<h3>モデル推定と実績</h3><table><tr><th>モデル</th><th>推定的中回数</th><th>実績</th></tr><tr><td>A</td><td>'+ea.toFixed(2)+'</td><td>'+ha+'</td></tr><tr><td>B</td><td>'+eb.toFixed(2)+'</td><td>'+hb+'</td></tr></table><p class="sub">推定回数は保存時の確率の合計。少数開催では精度を判断できません。</p><h3>勝ち馬の人気の和（保存時順位）</h3>'+bands.map(([a,b],i)=>'<div class="two" style="margin:8px 0"><span>'+a+'〜'+b+'：'+counts[i]+'開催</span><div class="bar"><i style="width:'+(100*counts[i]/rows.length)+'%"></i></div></div>').join('')+'<p class="sub">順位不明：'+missing+'開催</p><h3>レース別勝ち馬人気</h3><div class="scroll"><table><tr><th>レース</th><th>1人気</th><th>2〜3</th><th>4〜5</th><th>6以上</th><th>不明</th></tr>'+ranks.map((r,i)=>'<tr><td>第'+(i+1)+'R</td>'+r.map(n=>'<td>'+n+'</td>').join('')+'</tr>').join('')+'</table></div>'}
+document.getElementById('v37filter').addEventListener('change',render);const old=v33render;v33render=function(){old();render()};render();
+})();
+</script><script>function v62model(races){
+ const info=races.map(a=>{const p=a.map(h=>h.p),s=n=>p.slice(0,n).reduce((x,y)=>x+y,0),tail=p.slice(5).reduce((x,y)=>x+y,0);return {type:p[0]>=.4&&p[0]/p[1]>=1.8?'1強':s(2)>=.55&&p[1]/(p[2]||Infinity)>=1.4?'2強':s(3)>=.65?'3強':tail<=.30?'上位混戦':'全体混戦',p1:p[0],tail,top3:s(3)}});
+ let a=Array.from({length:91},()=>Array(6).fill(0));a[0][0]=1;
+ for(const race of races){const b=Array.from({length:91},()=>Array(6).fill(0));for(let s=0;s<=90;s++)for(let u=0;u<6;u++)if(a[s][u])for(const h of race){const k=u+Number(h.rank>=6);if(s+h.rank<=90&&k<6)b[s+h.rank][k]+=a[s][u]*h.p}a=b}
+ const sums=a.map(r=>r.reduce((x,y)=>x+y,0)),up=Array.from({length:6},(_,i)=>a.reduce((x,r)=>x+r[i],0));let low=5,mass=0;for(let i=5;i<=86;i++){const m=sums.slice(i,i+5).reduce((x,y)=>x+y,0);if(m>mass){low=i;mass=m}}
+ const bands=[[5,10],[11,15],[16,20],[21,25],[26,90]],joint=bands.map(([l,h])=>up.map((_,u)=>a.slice(l,h+1).reduce((x,r)=>x+r[u],0)));return {info,sums,up,low,mass,joint};
+}
+function v62render(){const t=document.getElementById('v62body');if(!last||calculatedFingerprint!==inputFingerprint()||$('msg').className==='warn'){t.textContent='入力を確認して再計算してください。';return}const m=v62model(last.races),pct=x=>(100*x).toFixed(1)+'%';const bar=(n,p)=>`<div style="margin:5px 0;${typeof n==='number'&&n>=m.low&&n<=m.low+4?'background:#e0f1e9;padding:4px;border-radius:5px':''}">${n}：${pct(p)}<div class="bar"><i style="width:${p*100}%"></i></div></div>`;t.innerHTML='<h3>レース構造（研究分類）</h3>'+m.info.map((r,i)=>`<p>第${i+1}R：<b>${r.type}</b>｜1番人気 ${pct(r.p1)}｜波乱 ${pct(r.tail)}</p>`).join('')+`<h3>人気の和：高出現ゾーン ${m.low}〜${m.low+4}</h3><p>推定包含率 ${pct(m.mass)}（幅5）</p>`+v63chart(m)+'<h3>波乱発生数</h3>'+m.up.map((p,i)=>bar(i+'レース',p)).join('')+'<h3>人気の和 × 波乱数</h3><div class="scroll"><table><thead><tr><th>人気の和</th>'+m.up.map((_,i)=>`<th>${i}R</th>`).join('')+'</tr></thead><tbody>'+m.joint.map((r,i)=>'<tr><th>'+['5〜10','11〜15','16〜20','21〜25','26以上'][i]+'</th>'+r.map(p=>`<td style="background:rgba(40,150,110,${Math.min(.35,p)})">${pct(p)}</td>`).join('')+'</tr>').join('')+'</tbody></table></div>';
+}
+
+const v62section=document.createElement('section');v62section.id='v62analysis';v62section.innerHTML='<h2>Ver.62｜開催構造分析</h2><p class="sub">6番人気以下の勝利を波乱と定義。独立性を仮定した推定値であり、実際の的中率ではありません。既存のA/B予想は変更しません。</p><div id="v62body">予測を計算してください。</div>';document.getElementById('output').after(v62section);
+const v62oldCalc=calculate;calculate=function(){v62oldCalc();v62render()};
+document.addEventListener('input',()=>{document.getElementById('v62body').textContent='入力変更後は再計算してください。'});
+</script><script>
+function v63chart(m){const max=Math.max(...m.sums),end=m.sums.reduce((a,p,i)=>p>0?i:a,5),w=300/Math.max(1,end-4);return '<svg viewBox="0 0 330 145" style="width:100%" role="img" aria-label="人気の和の分布">'+m.sums.slice(5,end+1).map((p,j)=>{const h=100*p/max,x=15+j*w;return `<rect x="${x}" y="${110-h}" width="${Math.max(1,w-1)}" height="${h}" fill="${j+5>=m.low&&j+5<=m.low+4?'#21805e':'#4388ae'}"/>${(j===0||(j+5)%5===0)?`<text x="${x}" y="125" font-size="9">${j+5}</text>`:''}`}).join('')+'</svg><p class="sub">緑：高出現ゾーン。棒の高さは最大確率に対する相対値。</p>'}
+const v63section=document.createElement('section');v63section.innerHTML='<h2>Ver.63｜購入なし検証記録</h2><p class="sub">締切前に固定した予測のみ。結果の順位は保存時の人気順です。</p><div id="v63records"></div>';document.getElementById('v37analysis').after(v63section);
+function v63render(){let n=0,h=0,expected=0;const rows=Object.entries(store.predictions).filter(([d,p])=>p.mode28==='paper'&&p.v63).sort().map(([d,p])=>{const r=store.results[d],rr=r?.winners?.map((x,i)=>p.races[i].find(y=>y.number===x)?.rank),valid=rr?.length===5&&rr.every(Number.isInteger),sum=valid?rr.reduce((a,b)=>a+b,0):null,ok=valid&&sum>=p.v63.low&&sum<=p.v63.low+4;if(valid){n++;h+=Number(ok);expected+=p.v63.mass}return `<tr><td>${esc(d)}</td><td>${p.v63.low}〜${p.v63.low+4}</td><td>${sum??'—'}</td><td>${valid?(ok?'包含':'範囲外'):r?'順位不明':'未記録'}</td></tr>`});$('v63records').innerHTML=`<p>評価済み ${n}開催 ／ 包含 ${h}開催 ／ 推定包含回数 ${expected.toFixed(2)}</p><p>実績包含率 ${n?(100*h/n).toFixed(1)+'%':'—'}</p><div class="scroll"><table><tr><th>開催日</th><th>予測ゾーン</th><th>実績</th><th>判定</th></tr>${rows.join('')}</table></div>`}
+for(const name of ['savePrediction','recordResult']){const old=window[name];window[name]=function(...args){const ret=old.apply(this,args);v63render();return ret}}v63render();
+</script><script>
+/* Ver76: frozen descriptive calibration protocol, no changes to ticket selection. */
+const V76_ID='V76-calibration-2026-11-27';
+const V76_BANDS=[[5,10],[11,15],[16,20],[21,25],[26,30],[31,90]];
+function v76snapshot(races,m){
+ const bands=V76_BANDS.map(([l,h])=>m.sums.slice(l,h+1).reduce((a,b)=>a+b,0));
+ const p0=races.reduce((a,r)=>a*(1-r[0].p),1);
+ const role=m.info.map((r,i)=>({i,p:r.tail})).sort((a,b)=>a.p-b.p||a.i-b.i);
+ if(Math.abs(bands.reduce((a,b)=>a+b,0)-1)>1e-8||!Number.isFinite(p0)||role.some(r=>!Number.isFinite(r.p)))throw Error('確率の検算に失敗');
+ return {id:V76_ID,bands,p0,w0:m.up[0],zone:[m.low,m.low+4],zoneP:m.mass,role};
+}
+function v76evaluate(p,r){
+ const s=p.v76;if(p.mode28!=='paper'||s?.id!==V76_ID)return null;
+ const t=[p.obt,p.savedAt28,p.dl].map(x=>new Date(x).getTime());
+ if(!t.every(Number.isFinite)||!(t[0]<=t[1]&&t[1]<t[2]))return null;
+ const ranks=r?.winners?.map((n,i)=>p.races[i]?.find(h=>h.number===n)?.rank);
+ if(ranks?.length!==5||!ranks.every(Number.isInteger))return null;
+ const sum=ranks.reduce((a,b)=>a+b,0), band=V76_BANDS.findIndex(([l,h])=>sum>=l&&sum<=h);
+ if(band<0)return null;
+ return {sum,band,zeroFav:Number(!ranks.includes(1)),zeroWave:Number(ranks.every(x=>x<6)),zone:Number(sum>=s.zone[0]&&sum<=s.zone[1]),roles:s.role.map(x=>Number(ranks[x.i]>=6)),loss:-Math.log(Math.max(1e-15,s.bands[band])),ranks};
+}
+
+const v76section=document.createElement('section');v76section.id='v76research';v76section.innerHTML='<h2>Ver.76｜固定研究プロトコル</h2><p class="sub">2021〜2025年は開発用。新規の実開催・購入なし記録だけを集計します。人気の和6区分、1番人気全敗、波乱なし、幅5ゾーン、荒れやすさ順位を固定評価。100開催を最初の評価目安とし、途中で条件を変更しません。端末時刻・手入力に依存し、第三者による時刻証明ではありません。</p><div id="v76stats"></div><button class="alt" onclick="v76export()">研究CSVを出力</button>';v63section.after(v76section);
+function v76rows(){return Object.entries(store.predictions).filter(([d,p])=>p.mode28==='paper'&&p.v76?.id===V76_ID).sort().map(([d,p])=>({d,p,e:v76evaluate(p,store.results[d])}));}
+function v76render(){const rows=v76rows(),valid=rows.filter(x=>x.e),n=valid.length;const pct=x=>n?(100*x/n).toFixed(2)+'%':'—';const metrics=[...V76_BANDS.map(([l,h],i)=>({name:l+'〜'+h,p:x=>x.p.v76.bands[i],y:x=>Number(x.e.band===i)})),{name:'1番人気全敗',p:x=>x.p.v76.p0,y:x=>x.e.zeroFav},{name:'波乱なし',p:x=>x.p.v76.w0,y:x=>x.e.zeroWave},{name:'幅5ゾーン包含',p:x=>x.p.v76.zoneP,y:x=>x.e.zone},...Array.from({length:5},(_,i)=>({name:'荒れやすさ順位 '+(i+1)+'（低→高）',p:x=>x.p.v76.role[i].p,y:x=>x.e.roles[i]}))];$('v76stats').innerHTML='<p>固定済み '+rows.length+'開催 ／ 評価済み '+n+'開催 ／ 未評価 '+(rows.length-n)+'開催</p><p>人気の和6区分 LogLoss：'+(n?(valid.reduce((a,x)=>a+x.e.loss,0)/n).toFixed(4):'—')+'</p><div class="scroll"><table><tr><th>評価項目</th><th>推定率</th><th>実績率</th><th>実績回数</th></tr>'+metrics.map(m=>'<tr><td>'+m.name+'</td><td>'+pct(valid.reduce((a,x)=>a+m.p(x),0))+'</td><td>'+pct(valid.reduce((a,x)=>a+m.y(x),0))+'</td><td>'+valid.reduce((a,x)=>a+m.y(x),0)+'</td></tr>').join('')+'</table></div><p class="sub">旧版・架空テストは対象外。未評価は結果未入力または検証条件不一致。</p>';}
+function v76export(){const header=['protocol','date','obtained','deadline','saved','status','p_5_10','p_11_15','p_16_20','p_21_25','p_26_30','p_31plus','p_zero_favorite','p_zero_wave','zone_low','zone_high','p_zone',...Array.from({length:5},(_,i)=>'role'+(i+1)+'_race'),...Array.from({length:5},(_,i)=>'role'+(i+1)+'_p'),...Array.from({length:5},(_,i)=>'role'+(i+1)+'_actual'),'actual_sum','actual_band','actual_zero_favorite','actual_zero_wave','actual_zone','logloss'];const rows=v76rows().map(({d,p,e})=>[V76_ID,d,p.obt,p.dl,p.savedAt28,e?'evaluated':'pending',...p.v76.bands,p.v76.p0,p.v76.w0,...p.v76.zone,p.v76.zoneP,...p.v76.role.map(x=>x.i+1),...p.v76.role.map(x=>x.p),...(e?e.roles:Array(5).fill('')),e?.sum??'',e?e.band+1:'',e?.zeroFav??'',e?.zeroWave??'',e?.zone??'',e?.loss??'']);download('win5_ver76_research.csv','\ufeff'+[header,...rows].map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\r\n'),'text/csv;charset=utf-8');}
+for(const name of ['savePrediction','recordResult','restoreBackup']){const old=window[name];window[name]=function(...args){const ret=old.apply(this,args);v76render();if(name==='restoreBackup')setTimeout(v76render,700);return ret;}}
+v76render();
+
+</script></body></html>
